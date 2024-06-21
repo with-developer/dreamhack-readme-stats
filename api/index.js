@@ -85,6 +85,8 @@ app.get('/api/stats', async (req, res) => {
       </svg>
     `;
 
+    res.setHeader('Content-Type', 'image/svg+xml');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.send(svg);
   } catch (error) {
     console.error(error);
