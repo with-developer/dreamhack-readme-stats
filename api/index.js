@@ -3,6 +3,25 @@ import fetch from 'node-fetch';
 
 const app = express();
 
+// 마지막 랭킹을 가져오는 함수
+async function getLastRank() {
+  try {
+    const response = await fetch('https://dreamhack.io/api/v1/ranking/wargame/?filter=global&limit=1&offset=99999');
+    const data = await response.json();
+    return data.count;
+  } catch (error) {
+    console.error('Error fetching last rank:', error);
+    return null;
+  }
+}
+
+// 상위 퍼센트 계산 함수
+function calculateTopPercentage(rank, totalRanks) {
+  if (!rank || !totalRanks) return 'N/A';
+  const percentage = (rank / totalRanks) * 100;
+  return percentage.toFixed(2);
+}
+
 app.get('/api/stats', async (req, res) => {
   const { username } = req.query;
 
@@ -11,79 +30,95 @@ app.get('/api/stats', async (req, res) => {
   }
 
   try {
-    const response = await fetch(`https://dreamhack.io/api/v1/user/profile/${username}/`);
-    const data = await response.json();
+    const [userResponse, lastRank] = await Promise.all([
+      fetch(`https://dreamhack.io/api/v1/user/profile/${username}/`),
+      getLastRank()
+    ]);
 
-    if (!response.ok) {
-      return res.status(response.status).json({ error: data.detail });
+    const userData = await userResponse.json();
+
+    if (!userResponse.ok) {
+      return res.status(userResponse.status).json({ error: userData.detail });
     }
 
     const {
       nickname,
-      // level,
       contributions,
       exp,
-      // rank,
       wargame,
       ctf,
       profile_image,
-      // additional_profile: { introduction, github, twitter, facebook, linkedin },
-    } = data;
+    } = userData;
+
+    const overallTopPercentage = calculateTopPercentage(contributions.rank, lastRank);
+    const wargameTopPercentage = calculateTopPercentage(wargame.rank, lastRank);
 
     const stats = {
-      nickname, // 필요
-      level: contributions.level, // 필요
+      nickname,
+      level: contributions.level,
       exp,
-      rank: contributions.rank, // 필요
-      wargame_solved: wargame.solved, //필요
-      wargame_rank: wargame.rank, //필요
-      wargame_score: wargame.score, //필요
-      ctf_rank: ctf.rank, //필요
-      ctf_tier: ctf.tier, //필요
-      ctf_rating: ctf.rating, //필요
-      profile_image, //불필요
-      // introduction, //불필요
-      // github, //불필요
-      // twitter, //불필요
-      // facebook, //불필요
-      // linkedin, //불필요
+      rank: `${contributions.rank}/${lastRank || 'N/A'}`,
+      rankPercentage: overallTopPercentage,
+      wargame_solved: wargame.solved,
+      wargame_rank: `${wargame.rank}/${lastRank || 'N/A'}`,
+      wargameRankPercentage: wargameTopPercentage,
+      wargame_score: wargame.score,
+      ctf_rank: ctf.rank,
+      ctf_tier: ctf.tier,
+      ctf_rating: ctf.rating,
+      profile_image,
     };
 
-    // res.setHeader('Content-Type', 'image/svg+xml');
-    // res.setHeader('Cache-Control', 'public, max-age=1800');
-
     const svg = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="495" height="195" viewBox="0 0 495 195" fill="none">
-        <style>
-          .header {
-            font: 600 18px 'Segoe UI', Ubuntu, Sans-Serif;
-            fill: #2f80ed;
-          }
-          .stat {
-            font: 600 14px 'Segoe UI', Ubuntu, Sans-Serif;
-            fill: #333;
-          }
-          .rank {
-            font: 600 14px 'Segoe UI', Ubuntu, Sans-Serif;
-            fill: #585858;
-          }
-          .info {
-            font: 400 11px 'Segoe UI', Ubuntu, Sans-Serif;
-            fill: #585858;
-          }
-        </style>
-        <rect x="0.5" y="0.5" width="494" height="194" rx="4.5" fill="#FFFEFE" stroke="#E4E2E2"/>
-        <image href="${stats.profile_image}" x="20" y="25" height="80" width="80"/>
-        <text x="115" y="50" class="header">${stats.nickname} (Level ${stats.level})</text>
-        <text x="115" y="75" class="rank">Rank: ${stats.rank}</text>
-        <text x="20" y="140" class="stat">Wargame Solved: ${stats.wargame_solved}</text>
-        <text x="20" y="160" class="stat">Wargame Rank: ${stats.wargame_rank}</text>
-        <text x="20" y="180" class="stat">Wargame Score: ${stats.wargame_score}</text>
-        <text x="250" y="140" class="stat">CTF Rank: ${stats.ctf_rank}</text>
-        <text x="250" y="160" class="stat">CTF Tier: ${stats.ctf_tier}</text>
-        <text x="250" y="180" class="stat">CTF Rating: ${stats.ctf_rating}</text>
-      </svg>
-    `;
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200" fill="none">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap');
+    .title { font: 700 18px 'Inter', sans-serif; fill: #ffffff; }
+    .weakness { font: 600 24px 'Inter', sans-serif; fill: rgba(255, 255, 255, 0.9); }
+    .stat-label { font: 400 14px 'Inter', sans-serif; fill: #6c757d; }
+    .stat-value { font: 700 20px 'Inter', sans-serif; fill: #6e45e2; }
+    .tier-badge { font: 700 16px 'Inter', sans-serif; fill: #ffffff; }
+  </style>
+  
+  <defs>
+    <linearGradient id="headerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6e45e2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#88d3ce;stop-opacity:1" />
+    </linearGradient>
+    <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="0" dy="0" result="offsetblur"/>
+      <feFlood flood-color="#000000" flood-opacity="0.1"/>
+      <feComposite in2="offsetblur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="400" height="200" fill="#ffffff" rx="12" ry="12"/>
+  <rect width="400" height="120" fill="url(#headerGradient)" rx="12" ry="12"/>
+  
+  <circle cx="55" cy="60" r="35" fill="rgba(255, 255, 255, 0.2)" filter="url(#dropShadow)"/>
+  <text x="55" y="55" class="tier-badge" text-anchor="middle">Top</text>
+  <text x="55" y="75" class="tier-badge" text-anchor="middle">${stats.rankPercentage}%</text>
+  
+  <text x="110" y="50" class="title">Dreamhack wargame stats</text>
+  <text x="110" y="85" class="weakness">${stats.nickname}</text>
+
+  <rect x="0" y="120" width="400" height="80" fill="#f8f9fa" rx="0" ry="0"/>
+  
+  <text x="70" y="150" class="stat-label" text-anchor="middle">Solved</text>
+  <text x="70" y="180" class="stat-value" text-anchor="middle">${stats.wargame_solved}</text>
+  
+  <text x="200" y="150" class="stat-label" text-anchor="middle">Score</text>
+  <text x="200" y="180" class="stat-value" text-anchor="middle">${stats.wargame_score}</text>
+  
+  <text x="330" y="150" class="stat-label" text-anchor="middle">Rank</text>
+  <text x="330" y="180" class="stat-value" text-anchor="middle">${stats.wargame_rank}</text>
+</svg>
+`;
 
     res.setHeader('Content-Type', 'image/svg+xml');
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
