@@ -10,6 +10,7 @@ interface UserData {
     rank: number;
   };
   exp: number;
+  total_wargame: number;
   wargame: {
     solved: number;
     rank: number;
@@ -90,7 +91,7 @@ app.get('/api/stats', async (req: Request, res: Response) => {
       exp,
       rank: `${contributions.rank}/${lastRank || 'N/A'}`,
       rankPercentage: overallTopPercentage,
-      wargame_solved: wargame.solved,
+      wargame_solved: userData.total_wargame,
       wargame_rank: `${wargame.rank}/${lastRank || 'N/A'}`,
       wargameRankPercentage: wargameTopPercentage,
       wargame_score: wargame.score,
