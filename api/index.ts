@@ -33,9 +33,9 @@ interface Stats {
   wargame_rank: string;
   wargameRankPercentage: string;
   wargame_score: number;
-  ctf_rank: number;
-  ctf_tier: string;
-  ctf_rating: number;
+  ctf_rank?: number;
+  ctf_tier?: string;
+  ctf_rating?: number;
   profile_image: string;
 }
 
@@ -94,9 +94,9 @@ app.get('/api/stats', async (req: Request, res: Response) => {
       wargame_rank: `${wargame.rank}/${lastRank || 'N/A'}`,
       wargameRankPercentage: wargameTopPercentage,
       wargame_score: wargame.score,
-      ctf_rank: ctf.rank,
-      ctf_tier: ctf.tier,
-      ctf_rating: ctf.rating,
+      // ctf_rank: ctf.rank,
+      // ctf_tier: ctf.tier,
+      // ctf_rating: ctf.rating,
       profile_image,
     };
 
