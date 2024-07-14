@@ -12,6 +12,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.6.0",
+    "@types/express": "^4.17.21",
+    "@types/node-fetch": "^2.6.11",
     "eslint": "^9.6.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
