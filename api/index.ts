@@ -1,12 +1,49 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import fetch from 'node-fetch';
 
 const app = express();
 
-// 마지막 랭킹을 가져오는 함수
-async function getLastRank() {
+interface UserData {
+  nickname: string;
+  contributions: {
+    level: number;
+    rank: number;
+  };
+  exp: number;
+  wargame: {
+    solved: number;
+    rank: number;
+    score: number;
+  };
+  ctf: {
+    rank: number;
+    tier: string;
+    rating: number;
+  };
+  profile_image: string;
+}
+
+interface Stats {
+  nickname: string;
+  level: number;
+  exp: number;
+  rank: string;
+  rankPercentage: string;
+  wargame_solved: number;
+  wargame_rank: string;
+  wargameRankPercentage: string;
+  wargame_score: number;
+  ctf_rank: number;
+  ctf_tier: string;
+  ctf_rating: number;
+  profile_image: string;
+}
+
+async function getLastRank(): Promise<number | null> {
   try {
-    const response = await fetch('https://dreamhack.io/api/v1/ranking/wargame/?filter=global&limit=1&offset=99999');
+    const response = await fetch(
+      'https://dreamhack.io/api/v1/ranking/wargame/?filter=global&limit=1&offset=99999'
+    );
     const data = await response.json();
     return data.count;
   } catch (error) {
@@ -15,45 +52,39 @@ async function getLastRank() {
   }
 }
 
-// 상위 퍼센트 계산 함수
-function calculateTopPercentage(rank, totalRanks) {
+function calculateTopPercentage(rank: number | null, totalRanks: number | null): string {
   if (!rank || !totalRanks) return 'N/A';
   const percentage = (rank / totalRanks) * 100;
   return percentage.toFixed(2);
 }
 
-app.get('/api/stats', async (req, res) => {
+app.get('/api/stats', async (req: Request, res: Response) => {
   const { username } = req.query;
 
-  if (!username) {
+  if (!username || typeof username !== 'string') {
     return res.status(400).json({ error: 'Username is required' });
   }
 
   try {
     const [userResponse, lastRank] = await Promise.all([
       fetch(`https://dreamhack.io/api/v1/user/profile/${username}/`),
-      getLastRank()
+      getLastRank(),
     ]);
 
-    const userData = await userResponse.json();
+    const userData: UserData = await userResponse.json();
 
     if (!userResponse.ok) {
       return res.status(userResponse.status).json({ error: userData.detail });
     }
 
-    const {
-      nickname,
-      contributions,
-      exp,
-      wargame,
-      ctf,
-      profile_image,
-    } = userData;
+    console.log('userData', userData);
+
+    const { nickname, contributions, exp, wargame, ctf, profile_image } = userData;
 
     const overallTopPercentage = calculateTopPercentage(contributions.rank, lastRank);
     const wargameTopPercentage = calculateTopPercentage(wargame.rank, lastRank);
 
-    const stats = {
+    const stats: Stats = {
       nickname,
       level: contributions.level,
       exp,
@@ -118,7 +149,7 @@ app.get('/api/stats', async (req, res) => {
   <text x="330" y="150" class="stat-label" text-anchor="middle">Rank</text>
   <text x="330" y="180" class="stat-value" text-anchor="middle">${stats.wargame_rank}</text>
 </svg>
-`;
+    `;
 
     res.setHeader('Content-Type', 'image/svg+xml');
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -129,7 +160,7 @@ app.get('/api/stats', async (req, res) => {
   }
 });
 
-app.get('/', (req, res) => {
+app.get('/', (req: Request, res: Response) => {
   res.send('Server is running');
 });
 
