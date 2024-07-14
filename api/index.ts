@@ -129,7 +129,7 @@ app.get('/api/stats', async (req: Request, res: Response) => {
   </defs>
 
   <rect width="400" height="200" fill="#ffffff" rx="12" ry="12"/>
-  <rect width="400" height="120" fill="url(#headerGradient)" rx="12" ry="12"/>
+  <rect width="400" height="120" fill="url(#headerGradient)"/>
   
   <circle cx="55" cy="60" r="35" fill="rgba(255, 255, 255, 0.2)" filter="url(#dropShadow)"/>
   <text x="55" y="55" class="tier-badge" text-anchor="middle">Top</text>
