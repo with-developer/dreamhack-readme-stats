@@ -34,7 +34,7 @@ export function generateSvg(stats: Tstats): string {
   
   <circle cx="55" cy="60" r="35" fill="rgba(255, 255, 255, 0.2)" filter="url(#dropShadow)"/>
   <text x="55" y="55" class="tier-badge" text-anchor="middle">TOP</text>
-  <text x="55" y="75" class="tier-badge" text-anchor="middle">${stats.rankPercentage}%</text>
+  <text x="55" y="75" class="tier-badge" text-anchor="middle">${stats.wargameRankPercentage}%</text>
   
   <text x="110" y="40" class="title">Dreamhack wargame stats</text>
   <text x="110" y="82" class="user-name">${stats.nickname}</text>
