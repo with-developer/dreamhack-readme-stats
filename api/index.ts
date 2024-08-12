@@ -1,8 +1,7 @@
 import express, { Request, Response } from 'express';
-import { TuserData, Tstats } from './types';
-import fetch from 'node-fetch';
+import { Tstats } from './types';
 import { generateSvg } from './generateSvg.js';
-import { getLastRank, calculateTopPercentage } from './utils.js';
+import { getLastRank, calculateTopPercentage, getUserId, getUserData } from './utils.js';
 
 const app = express();
 
@@ -14,35 +13,45 @@ app.get('/api/stats', async (req: Request, res: Response) => {
   }
 
   try {
-    const [userResponse, lastRank] = await Promise.all([
-      fetch(`https://dreamhack.io/api/v1/user/profile/${username}/`),
-      getLastRank(),
-    ]);
+    const userId = await getUserId(username);
+    const lastRank = await getLastRank();
 
-    const userData = await userResponse.json() as TuserData;
+    if (!userId) {
+      return res.status(400).json({ error: 'User not found' });
+    }
+    if (!lastRank) {
+      return res.status(500).json({ error: 'Failed to fetch last rank' });
+    }
 
-    if (!userResponse.ok) {
+    const userData = await getUserData(userId);
+    if (!userData) {
       return res.status(400).json({ error: 'User information cannot be read.' });
     }
 
     console.log('userData', userData);
 
-    const { nickname, contributions, exp, wargame, profile_image } = userData;
+    const {
+      nickname,
+      wargame,
+      // contributions,
+      // exp,
+      // profile_image
+    } = userData;
 
-    const overallTopPercentage = calculateTopPercentage(contributions.rank, lastRank);
+    // const overallTopPercentage = calculateTopPercentage(contributions.rank, lastRank);
     const wargameTopPercentage = calculateTopPercentage(wargame.rank, lastRank);
 
     const stats: Tstats = {
       nickname,
-      level: contributions.level,
-      exp,
-      rank: `${contributions.rank}/${lastRank || 'N/A'}`,
-      rankPercentage: overallTopPercentage,
       wargame_solved: userData.total_wargame,
       wargame_rank: `${wargame.rank}/${lastRank || 'N/A'}`,
       wargameRankPercentage: wargameTopPercentage,
       wargame_score: wargame.score,
-      profile_image,
+      // level: contributions.level,
+      // exp,
+      // rank: `${contributions.rank}/${lastRank || 'N/A'}`,
+      // rankPercentage: overallTopPercentage,
+      // profile_image,
     };
 
     const svg = generateSvg(stats);
