@@ -30,16 +30,17 @@ export function generateSvg(stats: Tstats): string {
   </defs>
 
   <rect width="390" height="195" fill="#ffffff" rx="12" ry="12"/>
-  <rect width="390" height="120" fill="url(#headerGradient)"/>
+  <rect width="390" height="130" fill="url(#headerGradient)" rx="12" ry="12"/>
   
   <circle cx="55" cy="60" r="35" fill="rgba(255, 255, 255, 0.2)" filter="url(#dropShadow)"/>
-  <text x="55" y="55" class="tier-badge" text-anchor="middle">Top</text>
+  <text x="55" y="55" class="tier-badge" text-anchor="middle">TOP</text>
   <text x="55" y="75" class="tier-badge" text-anchor="middle">${stats.rankPercentage}%</text>
   
   <text x="110" y="40" class="title">Dreamhack wargame stats</text>
   <text x="110" y="82" class="user-name">${stats.nickname}</text>
 
-  <rect x="0" y="120" width="390" height="80" fill="#f8f9fa" rx="0" ry="0"/>
+  <rect x="0" y="120" width="390" height="10" fill="#f8f9fa"/>
+  <rect x="0" y="120" width="390" height="70" fill="#f8f9fa" rx="12" ry="12"/>
   
   <text x="63" y="145" class="stat-label" text-anchor="middle">Solved</text>
   <text x="63" y="170" class="stat-value" text-anchor="middle">${stats.wargame_solved}</text>
