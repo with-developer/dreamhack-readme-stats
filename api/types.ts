@@ -21,20 +21,29 @@ export interface TuserData {
   
   export interface Tstats {
     nickname: string;
-    level: number;
-    exp: number;
-    rank: string;
-    rankPercentage: string;
     wargame_solved: number;
     wargame_rank: string;
     wargameRankPercentage: string;
     wargame_score: number;
-    ctf_rank?: number;
-    ctf_tier?: string;
-    ctf_rating?: number;
-    profile_image: string;
+    // level: number;
+    // exp: number;
+    // rank: string;
+    // rankPercentage: string;
+    // ctf_rank?: number;
+    // ctf_tier?: string;
+    // ctf_rating?: number;
+    // profile_image?: string;
   }
 
   export interface TgetLastRankResponse {
     count: number;
+  }
+
+  export interface TUserRankingResponse {
+    results: TUserRankingResult[];
+  }
+  
+  export interface TUserRankingResult {
+    id: number;
+    nickname: string;
   }
