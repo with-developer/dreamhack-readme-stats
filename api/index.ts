@@ -13,8 +13,10 @@ app.get('/api/stats', async (req: Request, res: Response) => {
   }
 
   try {
-    const userId = await getUserId(username);
-    const lastRank = await getLastRank();
+    const [userId, lastRank] = await Promise.all([
+      getUserId(username),
+      getLastRank()
+    ]);
 
     if (!userId) {
       return res.status(400).json({ error: 'User not found' });
