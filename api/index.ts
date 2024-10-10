@@ -71,4 +71,20 @@ app.get('/', (_req: Request, res: Response) => {
   return res.send('Server is running');
 });
 
+// vercel 서버 웜업을 위한 라우트
+app.get('/api/warmup', async (_req: Request, res: Response) => {
+  try {
+    const lastRank = await getLastRank();
+    
+    if (!lastRank) {
+      return res.status(500).json({ error: 'Failed to fetch last rank' });
+    }
+
+    return res.status(200).json({ message: 'Warmup successful', lastRank });
+  } catch (error) {
+    console.error('Warmup error:', error);
+    return res.status(500).json({ error: 'Warmup failed' });
+  }
+});
+
 export default app;
