@@ -11,5 +11,11 @@
       "src": "/(.*)",
       "dest": "/api/index.ts"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/warmup",
+      "schedule": "*/10 * * * *"
+    }
   ]
 }
