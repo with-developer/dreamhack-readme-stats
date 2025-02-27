@@ -40,7 +40,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(500).json({ error: 'Failed to fetch last rank' });
     }
 
-    const userData = await measureTime('getUserData', () => getUserData(userId));
+    // username을 함께 전달하여 캐시된 ID가 유효하지 않을 경우 재시도할 수 있도록 함
+    const userData = await measureTime('getUserData', () => getUserData(userId, username as string));
     if (!userData) {
       console.timeEnd('⏱️ 전체 API 실행 시간');
       return res.status(400).json({ error: 'User information cannot be read.' });
