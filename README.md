@@ -12,6 +12,17 @@ GitHub README 프로필에 표시할 수 있는 Dreamhack 워게임 통계 SVG �
 
 실제 사용 시에는 `사용자명`을 여러분의 Dreamhack 사용자 이름으로 변경하세요.
 
+## 예시
+
+다음은 실제 렌더링된 결과입니다:
+
+![Dreamhack Stats](https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness)
+
+마크다운 코드:
+```markdown
+![Dreamhack Stats](https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness)
+```
+
 ## 기술 스택
 
 - Next.js
