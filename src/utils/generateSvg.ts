@@ -1,4 +1,4 @@
-import { Tstats } from './types';
+import { Tstats } from '../types';
 
 export function generateSvg(stats: Tstats): string {
   return `
@@ -54,4 +54,4 @@ export function generateSvg(stats: Tstats): string {
 
 </svg>
   `;
-}
+} 

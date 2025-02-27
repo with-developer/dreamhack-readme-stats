@@ -1,33 +1,28 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "ES2022",
-    "lib": ["ES2022"],
-    "moduleResolution": "node",
-    "rootDir": "./",
-    "outDir": "./dist",
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "strictBindCallApply": true,
-    "strictPropertyInitialization": true,
-    "noImplicitThis": true,
-    "alwaysStrict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "forceConsistentCasingInFileNames": true,
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
     "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "baseUrl": ".",
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "paths": {
-      "*": ["node_modules/*", "api/*"]
+      "@/*": ["./*"]
     }
   },
-  "include": ["api/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }
