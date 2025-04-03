@@ -4,10 +4,18 @@ GitHub README 프로필에 표시할 수 있는 Dreamhack 워게임 통계 SVG �
 
 ## 사용 방법
 
-아래 URL을 마크다운 이미지 형식으로 README 파일에 추가하세요:
+### Markdown
 
-```
+```markdown
 ![Dreamhack Stats](https://dreamhack-readme-stats.vercel.app/api/stats?username=사용자명)
+```
+
+### HTML
+
+```html
+<a href="https://dreamhack.io/users/사용자명" target="_blank" rel="noopener noreferrer">
+  <img src="https://dreamhack-readme-stats.vercel.app/api/stats?username=사용자명" alt="Dreamhack Stats" />
+</a>
 ```
 
 실제 사용 시에는 `사용자명`을 여러분의 Dreamhack 사용자 이름으로 변경하세요.
@@ -21,6 +29,13 @@ GitHub README 프로필에 표시할 수 있는 Dreamhack 워게임 통계 SVG �
 마크다운 코드:
 ```markdown
 ![Dreamhack Stats](https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness)
+```
+
+HTML 코드:
+```html
+<a href="https://dreamhack.io/users/weakness" target="_blank" rel="noopener noreferrer">
+  <img src="https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness" alt="Dreamhack Stats" />
+</a>
 ```
 
 ## 기술 스택
