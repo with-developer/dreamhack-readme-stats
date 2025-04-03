@@ -1,3 +1,4 @@
 # Allow all crawlers
 User-agent: *
-Allow: / 
+Allow: /
+Sitemap: https://dreamhack-readme-stats.vercel.app/sitemap.xml 

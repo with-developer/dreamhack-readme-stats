@@ -14,10 +14,22 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Dreamhack Readme Stats</title>
-        <meta name="description" content="Dreamhack stats for GitHub readme" />
+        <title>Dreamhack Readme Stats - GitHub 프로필에 Dreamhack 통계 표시하기</title>
+        <meta name="description" content="GitHub README 프로필에 Dreamhack 워게임 통계를 표시하는 SVG 생성기입니다. 사용자의 해결한 문제 수, 랭킹, 점수 등을 자동으로 업데이트하여 표시합니다." />
+        <meta name="keywords" content="dreamhack, github, readme, stats, wargame, ctf, security, programming" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="author" content="Dreamhack Readme Stats" />
+        <meta property="og:title" content="Dreamhack Readme Stats" />
+        <meta property="og:description" content="GitHub README 프로필에 Dreamhack 워게임 통계를 표시하는 SVG 생성기" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://dreamhack-readme-stats.vercel.app" />
+        <meta property="og:image" content="https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Dreamhack Readme Stats" />
+        <meta name="twitter:description" content="GitHub README 프로필에 Dreamhack 워게임 통계를 표시하는 SVG 생성기" />
+        <meta name="twitter:image" content="https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness" />
         <link rel="icon" href="/favicon.ico" />
+        <link rel="canonical" href="https://dreamhack-readme-stats.vercel.app" />
       </Head>
       <main className={styles.main}>
         <h1 className={styles.title}>Dreamhack Readme Stats</h1>
