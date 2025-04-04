@@ -1,6 +1,6 @@
 .main {
     min-height: 100vh;
-    padding: 4rem 0;
+    padding: 2rem 0;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -8,22 +8,30 @@
     align-items: center;
 }
 
+.divider {
+    width: 60%;
+    margin: 1rem 0;
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+}
+
 .title {
     margin: 0;
     line-height: 1.15;
-    font-size: 4rem;
+    font-size: 3rem;
     text-align: center;
 }
 
 .description {
-    margin: 4rem 0;
+    margin: 1rem 0;
     line-height: 1.5;
     font-size: 1.5rem;
     text-align: center;
 }
 
 .exampleCard {
-    margin: 2rem 0;
+    margin: 1rem 0;
     padding: 1.5rem;
     text-align: left;
     color: inherit;
@@ -114,4 +122,31 @@
         padding: 0.4rem 0.8rem;
         font-size: 0.8rem;
     }
+}
+
+.githubLink {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.socialLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: #24292e;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.socialLink:hover {
+    background-color: #181a1b;
+}
+
+.socialLink svg {
+    width: 24px;
+    height: 24px;
 }
