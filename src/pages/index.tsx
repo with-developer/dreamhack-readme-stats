@@ -28,7 +28,11 @@ export default function Home() {
         <meta name="twitter:title" content="Dreamhack Readme Stats" />
         <meta name="twitter:description" content="GitHub README 프로필에 Dreamhack 워게임 통계를 표시하는 SVG 생성기" />
         <meta name="twitter:image" content="https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/site.webmanifest" />
+        <meta name="theme-color" content="#0099ff" />
         <link rel="canonical" href="https://dreamhack-readme-stats.vercel.app" />
       </Head>
       <main className={styles.main}>
