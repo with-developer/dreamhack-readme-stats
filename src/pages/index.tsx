@@ -91,19 +91,6 @@ export default function Home() {
               height={170} 
             />
           </a>
-          <a 
-            href="https://dreamhack.io/users/weakness" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className={styles.exampleLink}
-          >
-            <img 
-              src="/api/most-solved?username=4rmi0s" 
-              alt="Dreamhack category chart example" 
-              width={350} 
-              height={170} 
-            />
-          </a>
         </div>
 
         <div className={styles.exampleCard}>
