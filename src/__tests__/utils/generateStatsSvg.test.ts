@@ -1,7 +1,7 @@
-import { generateSvg } from '../../utils/generateSvg';
+import { generateStatsSvg } from '../../utils/generateStatsSvg';
 import { Tstats } from '../../types';
 
-describe('generateSvg 유틸리티 함수 테스트', () => {
+describe('generateStatsSvg 유틸리티 함수 테스트', () => {
   it('유효한 통계 데이터로 SVG를 생성해야 함', () => {
     const mockStats: Tstats = {
       nickname: 'testuser',
@@ -11,7 +11,7 @@ describe('generateSvg 유틸리티 함수 테스트', () => {
       wargame_score: 5000
     };
 
-    const result = generateSvg(mockStats);
+    const result = generateStatsSvg(mockStats);
     
     // SVG 문자열이 반환되었는지 확인
     expect(result).toContain('<svg');
@@ -34,7 +34,7 @@ describe('generateSvg 유틸리티 함수 테스트', () => {
       wargame_score: 5000
     };
 
-    const result = generateSvg(mockStats);
+    const result = generateStatsSvg(mockStats);
     
     // 특수 문자가 포함된 사용자 이름이 SVG에 포함되어 있는지 확인
     expect(result).toContain('test<user>');
@@ -49,7 +49,7 @@ describe('generateSvg 유틸리티 함수 테스트', () => {
       wargame_score: 5000
     };
 
-    const result = generateSvg(mockStats);
+    const result = generateStatsSvg(mockStats);
     
     // 긴 사용자 이름이 SVG에 포함되어 있는지 확인
     expect(result).toContain('verylongusernamethatmightcauseissueswithsvgrendering');

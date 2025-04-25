@@ -1,6 +1,6 @@
 import { Tstats } from '../types';
 
-export function generateSvg(stats: Tstats): string {
+export function generateStatsSvg(stats: Tstats): string {
   return `
 <svg xmlns="http://www.w3.org/2000/svg" width="350" height="170" viewBox="0 0 390 190" fill="none">
   <style>

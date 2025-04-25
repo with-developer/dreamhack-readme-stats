@@ -1,7 +1,7 @@
 import { createMocks } from 'node-mocks-http';
 import handler from '../../../pages/api/stats';
 import * as dreamhackUtils from '../../../utils/dreamhack';
-import * as generateSvgUtils from '../../../utils/generateSvg';
+import * as generateSvgUtils from '../../../utils/generateStatsSvg';
 import { TuserData } from '../../../types';
 
 // dreamhack 유틸리티 함수 모킹
@@ -12,9 +12,9 @@ jest.mock('../../../utils/dreamhack', () => ({
   calculateTopPercentage: jest.fn(),
 }));
 
-// generateSvg 유틸리티 함수 모킹
-jest.mock('../../../utils/generateSvg', () => ({
-  generateSvg: jest.fn(),
+// generateStatsSvg 유틸리티 함수 모킹
+jest.mock('../../../utils/generateStatsSvg', () => ({
+  generateStatsSvg: jest.fn(),
 }));
 
 describe('stats API 엔드포인트 테스트', () => {
@@ -45,7 +45,7 @@ describe('stats API 엔드포인트 테스트', () => {
     (dreamhackUtils.getLastRank as jest.Mock).mockResolvedValueOnce(mockLastRank);
     (dreamhackUtils.getUserData as jest.Mock).mockResolvedValueOnce(mockUserData);
     (dreamhackUtils.calculateTopPercentage as jest.Mock).mockReturnValueOnce('20.00');
-    (generateSvgUtils.generateSvg as jest.Mock).mockReturnValueOnce(mockSvg);
+    (generateSvgUtils.generateStatsSvg as jest.Mock).mockReturnValueOnce(mockSvg);
 
     // HTTP 요청 모킹
     const { req, res } = createMocks({
@@ -69,7 +69,7 @@ describe('stats API 엔드포인트 테스트', () => {
     expect(dreamhackUtils.getLastRank).toHaveBeenCalled();
     expect(dreamhackUtils.getUserData).toHaveBeenCalledWith(mockUserId, 'weakness');
     expect(dreamhackUtils.calculateTopPercentage).toHaveBeenCalledWith(mockUserData.wargame.rank, mockLastRank);
-    expect(generateSvgUtils.generateSvg).toHaveBeenCalledWith({
+    expect(generateSvgUtils.generateStatsSvg).toHaveBeenCalledWith({
       nickname: mockUserData.nickname,
       wargame_solved: mockUserData.total_wargame,
       wargame_rank: `${mockUserData.wargame.rank}/${mockLastRank}`,
