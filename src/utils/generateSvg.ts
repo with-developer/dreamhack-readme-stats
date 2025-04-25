@@ -29,9 +29,11 @@ export function generateSvg(stats: Tstats): string {
     </filter>
   </defs>
 
-  <rect width="390" height="195" fill="#ffffff" rx="12" ry="12"/>
+  <!-- 배경 -->
+  <rect width="390" height="190" fill="#ffffff" rx="12" ry="12"/>
   <rect width="390" height="130" fill="url(#headerGradient)" rx="12" ry="12"/>
   
+  <!-- 콘텐츠 -->
   <circle cx="55" cy="60" r="35" fill="rgba(255, 255, 255, 0.2)" filter="url(#dropShadow)"/>
   <text x="55" y="55" class="tier-badge" text-anchor="middle">TOP</text>
   <text x="55" y="75" class="tier-badge" text-anchor="middle">${stats.wargameRankPercentage}%</text>
@@ -51,7 +53,8 @@ export function generateSvg(stats: Tstats): string {
   <text x="323" y="145" class="stat-label" text-anchor="middle">Score</text>
   <text x="323" y="170" class="stat-value" text-anchor="middle">${stats.wargame_score}</text>
   
-
+  <!-- 테두리 -->
+  <rect x="0.5" y="0.5" width="389" height="189" fill="none" stroke="#333" stroke-width="0.5" rx="12" ry="12"/>
 </svg>
   `;
 } 
