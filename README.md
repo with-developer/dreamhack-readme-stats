@@ -38,6 +38,28 @@ HTML 코드:
 </a>
 ```
 
+## 카테고리 차트
+
+Dreamhack의 워게임 카테고리별 점수를 원형 차트로 표시합니다. 각 카테고리별 점수와 랭킹을 확인할 수 있습니다.
+
+### 사용 방법
+
+#### Markdown
+```markdown
+![Dreamhack Category Chart](https://dreamhack-readme-stats.vercel.app/api/most-solved?username=사용자명)
+```
+
+#### HTML
+```html
+<a href="https://dreamhack.io/users/사용자명" target="_blank" rel="noopener noreferrer">
+  <img src="https://dreamhack-readme-stats.vercel.app/api/most-solved?username=사용자명" alt="Dreamhack Category Chart" />
+</a>
+```
+
+### 예시
+
+![Dreamhack Category Chart](https://dreamhack-readme-stats.vercel.app/api/most-solved?username=weakness)
+
 ## 기술 스택
 
 - Next.js

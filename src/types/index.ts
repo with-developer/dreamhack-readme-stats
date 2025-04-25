@@ -60,4 +60,17 @@ export interface TUserRankingResponse {
 export interface TUserRankingResult {
   id: number;
   nickname: string;
+}
+
+export interface TCategoryData {
+  name: string;
+  score: number;
+  rank: number;
+  color: string;
+}
+
+export interface TCategoryStats {
+  nickname: string;
+  total_score: number;
+  categories: TCategoryData[];
 } 
