@@ -2,14 +2,14 @@ import { Tstats } from '../types';
 
 export function generateStatsSvg(stats: Tstats): string {
   return `
-<svg xmlns="http://www.w3.org/2000/svg" width="350" height="170" viewBox="0 0 390 190" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="190" viewBox="0 0 390 190" fill="none">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap');
-    .title { font: 700 18px 'Inter', sans-serif; fill: #ffffff; }
-    .user-name { font: 800 32px 'Inter', sans-serif; fill: rgba(255, 255, 255, 0.9); }
-    .stat-label { font: 400 14px 'Inter', sans-serif; fill: #6c757d; }
-    .stat-value { font: 700 20px 'Inter', sans-serif; fill: #6e45e2; }
-    .tier-badge { font: 700 16px 'Inter', sans-serif; fill: #ffffff; }
+    .title { font: 700 18px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; fill: #ffffff; }
+    .user-name { font: 800 32px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; fill: rgba(255, 255, 255, 0.9); }
+    .stat-label { font: 400 14px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; fill: #6c757d; }
+    .stat-value { font: 700 20px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; fill: #6e45e2; }
+    .tier-badge { font: 700 16px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; fill: #ffffff; }
   </style>
   
   <defs>
@@ -30,7 +30,7 @@ export function generateStatsSvg(stats: Tstats): string {
   </defs>
 
   <!-- 배경 -->
-  <rect width="390" height="190" fill="#ffffff" rx="12" ry="12"/>
+  <rect width="392" height="191" fill="#ffffff" rx="12" ry="12"/>
   <rect width="390" height="130" fill="url(#headerGradient)" rx="12" ry="12"/>
   
   <!-- 콘텐츠 -->

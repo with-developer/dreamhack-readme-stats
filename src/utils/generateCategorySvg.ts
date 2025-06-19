@@ -92,16 +92,16 @@ export function generateCategorySvg(stats: TCategoryStats): string {
 
   // SVG 구조 반환
   return `
-<svg xmlns="http://www.w3.org/2000/svg" width="350" height="170" viewBox="0 0 ${width} ${height}" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap');
-    .title { font: 700 18px 'Inter', sans-serif; fill:rgb(9, 112, 201); }
-    .user-name { font: 800 32px 'Inter', sans-serif; fill: #333; }
-    .legend-text { font: 400 17px 'Inter', sans-serif; fill: #444; }
-    .percentage-label { font: 600 10px 'Inter', sans-serif; fill: white; text-shadow: 0 0 2px rgba(0,0,0,0.5); }
-    .total-score-label { font: 500 10px 'Inter', sans-serif; fill: #777; }
-    .total-score-value { font: 700 14px 'Inter', sans-serif; fill: #6e45e2; }
-    .no-data { font: 500 12px 'Inter', sans-serif; fill: #888; }
+    .title { font: 700 16px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; fill:rgb(9, 112, 201); }
+    .user-name { font: 800 32px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; fill: #333; }
+    .legend-text { font: 400 17px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; fill: #444; }
+    .percentage-label { font: 600 10px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; fill: white; text-shadow: 0 0 2px rgba(0,0,0,0.5); }
+    .total-score-label { font: 500 10px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; fill: #777; }
+    .total-score-value { font: 700 14px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; fill: #6e45e2; }
+    .no-data { font: 500 12px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; fill: #888; }
   </style>
   
   <rect x="0.5" y="0.5" width="${width-1}" height="${height-1}" fill="#f8faff" rx="12" ry="12" stroke="#333" stroke-width="0.5" />
