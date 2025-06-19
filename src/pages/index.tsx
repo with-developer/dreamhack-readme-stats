@@ -138,7 +138,7 @@ export default function Home() {
             className={styles.exampleLink}
           >
             <img 
-              src="/api/most-solved?username=4rmi0s" 
+              src="/api/most-solved?username=weakness" 
               alt="Dreamhack category chart example" 
               width={350} 
               height={170} 
