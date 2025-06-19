@@ -10,7 +10,7 @@ export interface TuserData {
     solved: number;
     rank: number;
     score: number;
-    category: {
+    category?: {
       pwnable?: {
         score: number;
         rank: number;
