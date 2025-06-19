@@ -10,6 +10,28 @@ export interface TuserData {
     solved: number;
     rank: number;
     score: number;
+    category?: {
+      pwnable?: {
+        score: number;
+        rank: number;
+      };
+      reversing?: {
+        score: number;
+        rank: number;
+      };
+      web?: {
+        score: number;
+        rank: number;
+      };
+      crypto?: {
+        score: number;
+        rank: number;
+      };
+      [key: string]: {
+        score: number;
+        rank: number;
+      } | undefined;
+    };
   };
   ctf: {
     rank: number;
@@ -38,4 +60,17 @@ export interface TUserRankingResponse {
 export interface TUserRankingResult {
   id: number;
   nickname: string;
+}
+
+export interface TCategoryData {
+  name: string;
+  score: number;
+  rank: number;
+  color: string;
+}
+
+export interface TCategoryStats {
+  nickname: string;
+  total_score: number;
+  categories: TCategoryData[];
 } 

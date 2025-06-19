@@ -144,11 +144,13 @@ describe('dreamhack 유틸리티 함수 테스트', () => {
       });
       
       // getUserId 함수 호출 결과 모킹
-      const mockNewUserId = 12345;
+      const invalidUserId = 9999999; // 존재하지 않는 ID
+      const validUserId = 20691;     // 실제 존재하는 ID
+      
       (redisUtils.getUserIdFromCache as jest.Mock).mockResolvedValueOnce(null);
       const mockResponse: TUserRankingResponse = {
         results: [
-          { id: mockNewUserId, nickname: 'weakness' }
+          { id: validUserId, nickname: 'weakness' }
         ]
       };
       (fetch as jest.Mock).mockResolvedValueOnce({
@@ -171,11 +173,11 @@ describe('dreamhack 유틸리티 함수 테스트', () => {
         json: jest.fn().mockResolvedValueOnce(mockUserData),
       });
 
-      const result = await getUserData(20691, 'weakness');
+      const result = await getUserData(invalidUserId, 'weakness');
       
-      // 첫 번째 API 호출 확인
+      // 첫 번째 API 호출 확인 (존재하지 않는 ID)
       expect(fetch).toHaveBeenNthCalledWith(1,
-        'https://dreamhack.io/api/v1/user/profile/20691/'
+        `https://dreamhack.io/api/v1/user/profile/${invalidUserId}/`
       );
       
       // 새로운 사용자 ID 조회 확인
@@ -184,9 +186,9 @@ describe('dreamhack 유틸리티 함수 테스트', () => {
         'https://dreamhack.io/api/v1/ranking/wargame/?filter=global&limit=100&offset=0&search=weakness&scope=all&name=&category='
       );
       
-      // 새로운 사용자 ID로 다시 API 호출 확인
+      // 새로운 사용자 ID로 다시 API 호출 확인 (유효한 ID)
       expect(fetch).toHaveBeenNthCalledWith(3,
-        'https://dreamhack.io/api/v1/user/profile/12345/'
+        `https://dreamhack.io/api/v1/user/profile/${validUserId}/`
       );
       
       expect(result).toEqual(mockUserData);

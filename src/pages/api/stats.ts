@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Tstats } from '../../types';
-import { generateSvg } from '../../utils/generateSvg';
+import { generateStatsSvg } from '../../utils/generateStatsSvg';
 import { 
   getLastRank, 
   calculateTopPercentage, 
@@ -64,7 +64,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       wargame_score: wargame.score,
     };
 
-    const svg = generateSvg(stats);
+    const svg = generateStatsSvg(stats);
     console.timeEnd('⏱️ 데이터 가공 및 SVG 생성');
 
     res.setHeader('Content-Type', 'image/svg+xml');

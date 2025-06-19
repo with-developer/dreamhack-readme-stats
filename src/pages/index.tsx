@@ -75,6 +75,7 @@ export default function Home() {
             </code>
           </div>
         </div>
+
         <div className={styles.example}>
           <h3>예시:</h3>
           <a 
@@ -86,6 +87,59 @@ export default function Home() {
             <img 
               src="/api/stats?username=weakness" 
               alt="Dreamhack stats example" 
+              width={350} 
+              height={170} 
+            />
+          </a>
+        </div>
+
+        <div className={styles.exampleCard}>
+          <h2>카테고리 차트:</h2>
+          <div className={styles.codeSection}>
+            <div className={styles.codeHeader}>
+              <h3>Markdown:</h3>
+              <button 
+                className={styles.copyButton}
+                onClick={() => copyToClipboard('![Dreamhack Category Chart](https://dreamhack-readme-stats.vercel.app/api/most-solved?username=사용자명)')}
+              >
+                COPY
+              </button>
+            </div>
+            <code className={styles.code}>
+              ![Dreamhack Category Chart](https://dreamhack-readme-stats.vercel.app/api/most-solved?username=사용자명)
+            </code>
+          </div>
+          <div className={styles.codeSection}>
+            <div className={styles.codeHeader}>
+              <h3>HTML:</h3>
+              <button 
+                className={styles.copyButton}
+                onClick={() => copyToClipboard(`<a href="https://dreamhack.io/users/사용자명" target="_blank" rel="noopener noreferrer">
+  <img src="https://dreamhack-readme-stats.vercel.app/api/most-solved?username=사용자명" alt="Dreamhack Category Chart" />
+</a>`)}
+              >
+                COPY
+              </button>
+            </div>
+            <code className={styles.code}>
+              {`<a href="https://dreamhack.io/users/사용자명" target="_blank" rel="noopener noreferrer">
+  <img src="https://dreamhack-readme-stats.vercel.app/api/most-solved?username=사용자명" alt="Dreamhack Category Chart" />
+</a>`}
+            </code>
+          </div>
+        </div>
+
+        <div className={styles.example}>
+          <h3>카테고리 차트 예시:</h3>
+          <a 
+            href="https://dreamhack.io/users/weakness" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className={styles.exampleLink}
+          >
+            <img 
+              src="/api/most-solved?username=weakness" 
+              alt="Dreamhack category chart example" 
               width={350} 
               height={170} 
             />
