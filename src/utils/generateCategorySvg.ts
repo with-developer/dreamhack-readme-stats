@@ -4,7 +4,7 @@ export function generateCategorySvg(stats: TCategoryStats): string {
   // SVG 크기 및 차트 설정
   const width = 390;
   const height = 190;
-  const pieCenterX = 95;   // 원형 차트 중심 X (왼쪽)
+  const pieCenterX = 290;   // 원형 차트 중심 X (왼쪽)
   const pieCenterY = 96;   // 원형 차트 중심 Y
   const radius = 88;       // 원형 차트 반지름
   
@@ -20,7 +20,7 @@ export function generateCategorySvg(stats: TCategoryStats): string {
   let legends = '';
   let currentAngle = 0;
 
-  const legendStartX = 230; // 범례 시작 X 위치 (오른쪽)
+  const legendStartX = 25; // 범례 시작 X 위치 (오른쪽)
   const legendStartY = 80;  // 범례 시작 Y 위치 (제목 아래)
   const legendItemHeight = 22; // 범례 항목 간 간격
   const maxLegendItems = 5;  // 표시할 최대 범례 항목 수
@@ -86,8 +86,8 @@ export function generateCategorySvg(stats: TCategoryStats): string {
   
   // 제목 (오른쪽 상단)
   const header = `
-    <text x="${legendStartX-40}" y="35" class="title" text-anchor="start">Dreamhack</text>
-    <text x="${legendStartX-40}" y="55" class="title" text-anchor="start">Most solved categories</text>
+    <text x="${legendStartX-5}" y="35" class="title" text-anchor="start">Dreamhack</text>
+    <text x="${legendStartX-5}" y="55" class="title" text-anchor="start">Most solved categories</text>
   `;
 
   // SVG 구조 반환
@@ -95,16 +95,16 @@ export function generateCategorySvg(stats: TCategoryStats): string {
 <svg xmlns="http://www.w3.org/2000/svg" width="350" height="170" viewBox="0 0 ${width} ${height}" fill="none">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap');
-    .title { font: 700 18px 'Inter', sans-serif; fill: #333; }
+    .title { font: 700 18px 'Inter', sans-serif; fill:rgb(9, 112, 201); }
     .user-name { font: 800 32px 'Inter', sans-serif; fill: #333; }
-    .legend-text { font: 400 14px 'Inter', sans-serif; fill: #555; }
+    .legend-text { font: 400 17px 'Inter', sans-serif; fill: #444; }
     .percentage-label { font: 600 10px 'Inter', sans-serif; fill: white; text-shadow: 0 0 2px rgba(0,0,0,0.5); }
     .total-score-label { font: 500 10px 'Inter', sans-serif; fill: #777; }
     .total-score-value { font: 700 14px 'Inter', sans-serif; fill: #6e45e2; }
     .no-data { font: 500 12px 'Inter', sans-serif; fill: #888; }
   </style>
   
-  <rect x="0.5" y="0.5" width="${width-1}" height="${height-1}" fill="#f8f9fa" rx="12" ry="12" stroke="#333" stroke-width="0.5" />
+  <rect x="0.5" y="0.5" width="${width-1}" height="${height-1}" fill="#f8faff" rx="12" ry="12" stroke="#333" stroke-width="0.5" />
   
   <!-- 제목 (오른쪽 상단) -->
   ${header}
