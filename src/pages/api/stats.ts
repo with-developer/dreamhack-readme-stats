@@ -1,11 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Tstats } from '../../types';
 import { generateStatsSvg } from '../../utils/generateStatsSvg';
-import { 
-  getLastRank, 
-  calculateTopPercentage, 
-  getUserId, 
-  getUserData 
+import {
+  getLastRank,
+  calculateTopPercentage,
+  getUserId,
+  getUserData
 } from '../../utils/dreamhack';
 
 // 성능 측정을 위한 유틸리티 함수
