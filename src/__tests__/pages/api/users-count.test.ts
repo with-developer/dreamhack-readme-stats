@@ -41,8 +41,8 @@ describe('users-count API 엔드포인트 테스트', () => {
     const data = JSON.parse(res._getData());
     expect(data).toEqual({
       schemaVersion: 1,
-      label: 'users',
-      message: '2', // 고유 사용자 2명
+      label: 'used by',
+      message: '2 README.md', // 고유 사용자 2명
       color: 'blue'
     });
   });

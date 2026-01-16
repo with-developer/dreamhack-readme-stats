@@ -51,8 +51,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
     return res.status(200).json({
       schemaVersion: 1,
-      label: 'users',
-      message: String(count),
+      label: 'used by',
+      message: `${count} README.md`,
       color: 'blue'
     });
   } catch (error) {

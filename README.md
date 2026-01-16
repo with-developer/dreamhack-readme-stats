@@ -4,7 +4,7 @@
 
 **GitHub README에 Dreamhack 워게임 통계를 표시하세요**
 
-[![Used By](https://img.shields.io/badge/used%20by-13%20README.md-blue)](https://github.com/search?q=%22dreamhack-readme-stats.vercel.app%2Fapi%2F%22+in%3Afile+filename%3AREADME.md&type=code)
+[![Used By](https://img.shields.io/endpoint?url=https://dreamhack-readme-stats.vercel.app/api/users-count)](https://github.com/search?q=%22dreamhack-readme-stats.vercel.app%2Fapi%2F%22+in%3Afile+filename%3AREADME.md&type=code)
 ![GitHub release](https://img.shields.io/github/v/release/with-developer/dreamhack-readme-stats)
 ![License](https://img.shields.io/github/license/with-developer/dreamhack-readme-stats)
 
