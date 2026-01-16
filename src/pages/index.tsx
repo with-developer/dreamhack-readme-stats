@@ -78,17 +78,17 @@ export default function Home() {
 
         <div className={styles.example}>
           <h3>예시:</h3>
-          <a 
-            href="https://dreamhack.io/users/weakness" 
-            target="_blank" 
+          <a
+            href="https://dreamhack.io/users/weakness"
+            target="_blank"
             rel="noopener noreferrer"
             className={styles.exampleLink}
           >
-            <img 
-              src="/api/stats?username=weakness" 
-              alt="Dreamhack stats example" 
-              width={350} 
-              height={170} 
+            <img
+              src="/api/stats?username=weakness"
+              alt="Dreamhack stats example"
+              width={350}
+              height={170}
             />
           </a>
         </div>
