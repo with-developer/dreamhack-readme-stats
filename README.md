@@ -1,132 +1,96 @@
+<div align="center">
+
 # Dreamhack Readme Stats
 
-GitHub README 프로필에 표시할 수 있는 Dreamhack 워게임 통계 SVG 생성기입니다.
+**GitHub README에 Dreamhack 워게임 통계를 표시하세요**
 
-## 사용 방법
+[![Used By](https://img.shields.io/endpoint?url=https://dreamhack-readme-stats.vercel.app/api/users-count)](https://github.com/search?q=%22dreamhack-readme-stats.vercel.app%2Fapi%2F%22+in%3Afile+filename%3AREADME.md&type=code)
+![GitHub release](https://img.shields.io/github/v/release/with-developer/dreamhack-readme-stats)
+![License](https://img.shields.io/github/license/with-developer/dreamhack-readme-stats)
 
-### Markdown
+<br />
+
+![Dreamhack Stats](https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness)
+
+![Dreamhack Category Chart](https://dreamhack-readme-stats.vercel.app/api/most-solved?username=weakness)
+
+</div>
+
+---
+
+## Quick Start
+
+README에 아래 코드를 추가하고 `사용자명`을 본인의 Dreamhack 닉네임으로 변경하세요.
+
+### Wargame Stats
 
 ```markdown
 ![Dreamhack Stats](https://dreamhack-readme-stats.vercel.app/api/stats?username=사용자명)
 ```
 
-### HTML
+### Most Solved Categories
 
-```html
-<a href="https://dreamhack.io/users/사용자명" target="_blank" rel="noopener noreferrer">
-  <img src="https://dreamhack-readme-stats.vercel.app/api/stats?username=사용자명" alt="Dreamhack Stats" />
-</a>
-```
-
-실제 사용 시에는 `사용자명`을 여러분의 Dreamhack 사용자 이름으로 변경하세요.
-
-## 예시
-
-다음은 실제 렌더링된 결과입니다:
-
-![Dreamhack Stats](https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness)
-
-마크다운 코드:
 ```markdown
-![Dreamhack Stats](https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness)
+![Dreamhack Categories](https://dreamhack-readme-stats.vercel.app/api/most-solved?username=사용자명)
 ```
 
-HTML 코드:
-```html
-<a href="https://dreamhack.io/users/weakness" target="_blank" rel="noopener noreferrer">
-  <img src="https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness" alt="Dreamhack Stats" />
-</a>
-```
+> 💡 클릭 시 Dreamhack 프로필로 이동하게 하려면 HTML 사용:
+> ```html
+> <a href="https://dreamhack.io/users/사용자명">
+>   <img src="https://dreamhack-readme-stats.vercel.app/api/stats?username=사용자명" />
+> </a>
+> ```
 
-## 카테고리 차트
+---
 
-Dreamhack의 워게임 카테고리별 점수를 원형 차트로 표시합니다. 각 카테고리별 점수와 랭킹을 확인할 수 있습니다.
+## Features
 
-### 사용 방법
+| Feature | Description |
+|---------|-------------|
+| **Wargame Stats** | 해결한 문제 수, 랭킹, 점수, TOP % 표시 |
+| **Category Chart** | 카테고리별 점수 분포를 파이 차트로 시각화 |
+| **Auto Update** | 실시간으로 최신 통계 반영 |
+| **Caching** | Redis 캐싱으로 빠른 응답 속도 |
 
-#### Markdown
-```markdown
-![Dreamhack Category Chart](https://dreamhack-readme-stats.vercel.app/api/most-solved?username=사용자명)
-```
+---
 
-#### HTML
-```html
-<a href="https://dreamhack.io/users/사용자명" target="_blank" rel="noopener noreferrer">
-  <img src="https://dreamhack-readme-stats.vercel.app/api/most-solved?username=사용자명" alt="Dreamhack Category Chart" />
-</a>
-```
+## Local Development
 
-### 예시
-
-![Dreamhack Category Chart](https://dreamhack-readme-stats.vercel.app/api/most-solved?username=weakness)
-
-## 기술 스택
-
-- Next.js
-- TypeScript
-- Node.js
-- Redis (캐싱)
-
-## 로컬에서 실행하기
-
-1. 저장소 클론
-```
-git clone https://github.com/yourusername/dreamhack-readme-stats.git
+```bash
+# 저장소 클론
+git clone https://github.com/with-developer/dreamhack-readme-stats.git
 cd dreamhack-readme-stats
-```
 
-2. 의존성 설치
-```
+# 의존성 설치
 npm install
-```
 
-3. 개발 서버 실행
-```
+# 환경변수 설정
+cp .env.local.example .env.local
+
+# 개발 서버 실행
 npm run dev
 ```
 
-4. 브라우저에서 확인
-```
-http://localhost:3000
-```
+http://localhost:3000 에서 확인
 
-## Redis 캐싱 설정
+### Environment Variables
 
-성능 향상을 위해 Redis 캐싱을 사용합니다. 사용자 ID 조회 결과를 캐싱하여 API 응답 시간을 크게 단축합니다.
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `REDIS_URL` | No | Redis 연결 URL (캐싱용) |
+| `GITHUB_TOKEN` | No | GitHub API 토큰 (사용자 수 집계용) |
 
-### 로컬 환경에서 Redis 설정하기
+---
 
-1. `.env.local.example` 파일을 `.env.local`로 복사합니다.
-```
-cp .env.local.example .env.local
-```
+## Tech Stack
 
-2. `.env.local` 파일을 편집하여 Redis 연결 정보를 설정합니다.
+- **Framework**: Next.js 14
+- **Language**: TypeScript
+- **Cache**: Redis (Upstash)
+- **Deploy**: Vercel
 
-Redis 연결은 두 가지 방법으로 설정할 수 있습니다:
+---
 
-#### 방법 1: REDIS_URL 사용 (권장)
-```
-REDIS_URL=redis://username:password@host:port
-```
+## License
 
-#### 방법 2: 개별 설정 사용
-```
-REDIS_HOST=localhost
-REDIS_PORT=6379
-REDIS_USERNAME=default
-REDIS_PASSWORD=your_password
-REDIS_TLS=false
-```
-
-### Redis 서비스 제공업체
-
-다음과 같은 Redis 서비스를 사용할 수 있습니다:
-
-- [Upstash](https://upstash.com/) - 서버리스 Redis (무료 티어 제공)
-- [Redis Cloud](https://redis.com/redis-enterprise-cloud/overview/) - 관리형 Redis 서비스
-- 로컬 Redis 서버
-
-### Redis 없이 실행하기
-
-Redis 설정이 없어도 애플리케이션은 정상적으로 작동합니다. 다만, 캐싱 기능이 비활성화되어 모든 요청이 Dreamhack API를 직접 호출하게 됩니다.
+MIT License
