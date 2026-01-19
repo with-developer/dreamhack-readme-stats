@@ -2,6 +2,6 @@
   "framework": "nextjs",
   "outputDirectory": ".next",
   "git": {
-    "deploymentEnabled": false
+    "deploymentEnabled": true
   }
 } 
