@@ -112,4 +112,38 @@ describe('generateCategorySvg 유틸리티 함수 테스트', () => {
     expect(percentLabels.length).toBe(1);
     expect(percentLabels[0]).toContain('93%');
   });
+
+  it('light 테마(기본)로 SVG를 생성해야 함', () => {
+    const mockStats: TCategoryStats = {
+      nickname: 'weakness',
+      total_score: 5000,
+      categories: [
+        { name: 'web', score: 2000, rank: 50, color: '#ff6b6b' }
+      ]
+    };
+
+    const result = generateCategorySvg(mockStats);
+
+    // light 테마 색상 확인
+    expect(result).toContain('fill="#ffffff"'); // background
+    expect(result).toContain('fill="#f8fafc"'); // cardBackground
+    expect(result).toContain('stroke="#e2e8f0"'); // border
+  });
+
+  it('dark 테마로 SVG를 생성해야 함', () => {
+    const mockStats: TCategoryStats = {
+      nickname: 'weakness',
+      total_score: 5000,
+      categories: [
+        { name: 'web', score: 2000, rank: 50, color: '#ff6b6b' }
+      ]
+    };
+
+    const result = generateCategorySvg(mockStats, 'dark');
+
+    // dark 테마 색상 확인
+    expect(result).toContain('fill="#0d1117"'); // background
+    expect(result).toContain('fill="#21262d"'); // cardBackground
+    expect(result).toContain('stroke="#30363d"'); // border
+  });
 }); 
