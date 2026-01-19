@@ -73,4 +73,16 @@ export interface TCategoryStats {
   nickname: string;
   total_score: number;
   categories: TCategoryData[];
+}
+
+export type Theme = 'light' | 'dark';
+
+export interface ThemeColors {
+  background: string;
+  cardBackground: string;
+  border: string;
+  title: string;
+  text: string;
+  subText: string;
+  accent: string;
 } 
