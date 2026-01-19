@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main, dev ]
 
+permissions:
+  contents: read
+  deployments: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -48,7 +52,7 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         environment: Production
-        target_url: ${{ steps.deploy.outputs.preview-url }}
+        environment-url: ${{ steps.deploy.outputs.preview-url }}
 
   deploy-preview:
     needs: test
@@ -72,4 +76,4 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         environment: Preview
-        target_url: ${{ steps.deploy.outputs.preview-url }} 
+        environment-url: ${{ steps.deploy.outputs.preview-url }} 
