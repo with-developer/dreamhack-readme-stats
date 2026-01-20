@@ -43,12 +43,28 @@ README에 아래 코드를 추가하고 `사용자명`을 본인의 Dreamhack �
 
 ---
 
+## Themes
+
+`theme` 파라미터로 테마를 변경할 수 있습니다.
+
+```markdown
+![Dreamhack Stats](https://dreamhack-readme-stats.vercel.app/api/stats?username=사용자명&theme=dark)
+```
+
+| Theme | Wargame Stats | Most Solved Categories |
+|-------|---------------|------------------------|
+| `light` | ![Stats Light](https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness&theme=light) | ![Categories Light](https://dreamhack-readme-stats.vercel.app/api/most-solved?username=weakness&theme=light) |
+| `dark` | ![Stats Dark](https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness&theme=dark) | ![Categories Dark](https://dreamhack-readme-stats.vercel.app/api/most-solved?username=weakness&theme=dark) |
+
+---
+
 ## Features
 
 | Feature | Description |
 |---------|-------------|
 | **Wargame Stats** | 해결한 문제 수, 랭킹, 점수, TOP % 표시 |
 | **Category Chart** | 카테고리별 점수 분포를 파이 차트로 시각화 |
+| **Themes** | Light/Dark 테마 지원 |
 | **Auto Update** | 실시간으로 최신 통계 반영 |
 | **Caching** | Redis 캐싱으로 빠른 응답 속도 |
 

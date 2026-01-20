@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { TCategoryData, TCategoryStats } from '../../types';
+import { TCategoryData, TCategoryStats, Theme } from '../../types';
 import { generateCategorySvg } from '../../utils/generateCategorySvg';
 import { getUserId, getUserData } from '../../utils/dreamhack';
 
@@ -31,11 +31,14 @@ const defaultColors = [
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   console.time('⏱️ 전체 API 실행 시간');
-  const { username } = req.query;
+  const { username, theme: themeParam } = req.query;
 
   if (!username || typeof username !== 'string') {
     return res.status(400).json({ error: 'Username is required' });
   }
+
+  // 테마 파라미터 검증
+  const theme: Theme = themeParam === 'dark' ? 'dark' : 'light';
 
   try {
     // 개별 API 호출 시간 측정
@@ -69,8 +72,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         total_score: wargame.score || 0,
         categories: []
       };
-      
-      const svg = generateCategorySvg(emptyStats);
+
+      const svg = generateCategorySvg(emptyStats, theme);
       res.setHeader('Content-Type', 'image/svg+xml');
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
       console.timeEnd('⏱️ 전체 API 실행 시간');
@@ -99,7 +102,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       categories
     };
 
-    const svg = generateCategorySvg(categoryStats);
+    const svg = generateCategorySvg(categoryStats, theme);
     console.timeEnd('⏱️ 데이터 가공 및 SVG 생성');
 
     res.setHeader('Content-Type', 'image/svg+xml');

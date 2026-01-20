@@ -75,7 +75,52 @@ describe('stats API 엔드포인트 테스트', () => {
       wargame_rank: `${mockUserData.wargame.rank}/${mockLastRank}`,
       wargameRankPercentage: '20.00',
       wargame_score: mockUserData.wargame.score,
+    }, 'light');
+  });
+
+  it('dark 테마 파라미터로 SVG를 생성해야 함', async () => {
+    // 모킹된 데이터 설정
+    const mockUserId = 20691;
+    const mockLastRank = 1000;
+    const mockUserData: TuserData = {
+      nickname: 'weakness',
+      contributions: { level: 1, rank: 100 },
+      exp: 1000,
+      total_wargame: 50,
+      wargame: { solved: 50, rank: 200, score: 5000 },
+      ctf: { rank: 300, tier: 'Gold', rating: 2000 },
+      profile_image: 'image.jpg'
+    };
+    const mockSvg = '<svg>Mock Dark SVG</svg>';
+
+    // 모킹된 함수 구현
+    (dreamhackUtils.getUserId as jest.Mock).mockResolvedValueOnce(mockUserId);
+    (dreamhackUtils.getLastRank as jest.Mock).mockResolvedValueOnce(mockLastRank);
+    (dreamhackUtils.getUserData as jest.Mock).mockResolvedValueOnce(mockUserData);
+    (dreamhackUtils.calculateTopPercentage as jest.Mock).mockReturnValueOnce('20.00');
+    (generateSvgUtils.generateStatsSvg as jest.Mock).mockReturnValueOnce(mockSvg);
+
+    // HTTP 요청 모킹 (theme=dark 포함)
+    const { req, res } = createMocks({
+      method: 'GET',
+      query: {
+        username: 'weakness',
+        theme: 'dark',
+      },
     });
+
+    // API 핸들러 호출
+    await handler(req, res);
+
+    // 응답 검증
+    expect(res._getStatusCode()).toBe(200);
+    expect(res._getData()).toBe(mockSvg);
+
+    // dark 테마로 호출되었는지 확인
+    expect(generateSvgUtils.generateStatsSvg).toHaveBeenCalledWith(
+      expect.objectContaining({ nickname: 'weakness' }),
+      'dark'
+    );
   });
 
   it('사용자 이름이 없을 때 400 에러를 반환해야 함', async () => {

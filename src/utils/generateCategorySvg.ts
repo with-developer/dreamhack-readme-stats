@@ -1,6 +1,28 @@
-import { TCategoryStats } from '../types';
+import { TCategoryStats, Theme, ThemeColors } from '../types';
 
-export function generateCategorySvg(stats: TCategoryStats): string {
+const themes: Record<Theme, ThemeColors> = {
+  light: {
+    background: '#ffffff',
+    cardBackground: '#f8fafc',
+    border: '#e2e8f0',
+    title: '#64748b',
+    text: '#0f172a',
+    subText: '#94a3b8',
+    accent: '#3b82f6',
+  },
+  dark: {
+    background: '#0d1117',
+    cardBackground: '#21262d',
+    border: '#30363d',
+    title: '#8b949e',
+    text: '#e6edf3',
+    subText: '#7d8590',
+    accent: '#58a6ff',
+  },
+};
+
+export function generateCategorySvg(stats: TCategoryStats, theme: Theme = 'light'): string {
+  const colors = themes[theme];
   // SVG 크기 및 차트 설정
   const width = 390;
   const height = 190;
@@ -27,7 +49,7 @@ export function generateCategorySvg(stats: TCategoryStats): string {
 
   // 카테고리가 없는 경우
   if (categories.length === 0 || totalCategoryScore === 0) {
-    pieChart = `<circle cx="${pieCenterX}" cy="${pieCenterY}" r="${radius}" fill="#e2e8f0" />
+    pieChart = `<circle cx="${pieCenterX}" cy="${pieCenterY}" r="${radius}" fill="${colors.border}" />
     <text x="${pieCenterX}" y="${pieCenterY}" text-anchor="middle" class="no-data">No data</text>`;
     legends = `<text x="${legendStartX}" y="${legendStartY + 10}" class="no-data">No category data</text>`;
   } else {
@@ -50,7 +72,7 @@ export function generateCategorySvg(stats: TCategoryStats): string {
         <path
           d="M ${pieCenterX} ${pieCenterY} L ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY} Z"
           fill="${category.color}"
-          stroke="white"
+          stroke="${colors.background}"
           stroke-width="1"
         />
       `;
@@ -82,7 +104,7 @@ export function generateCategorySvg(stats: TCategoryStats): string {
 
   // 중앙 총점 표시 (원형 차트 내부에)
   const centerCircle = `
-    <circle cx="${pieCenterX}" cy="${pieCenterY}" r="${radius * 0.45}" fill="white" />
+    <circle cx="${pieCenterX}" cy="${pieCenterY}" r="${radius * 0.45}" fill="${colors.background}" />
     <text x="${pieCenterX}" y="${pieCenterY - 6}" text-anchor="middle" class="total-score-label">Total</text>
     <text x="${pieCenterX}" y="${pieCenterY + 12}" text-anchor="middle" class="total-score-value">${totalScore}</text>
   `;
@@ -92,23 +114,23 @@ export function generateCategorySvg(stats: TCategoryStats): string {
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;display=swap');
-    .title { font: 500 13px 'JetBrains Mono', monospace; fill: #64748b; }
-    .legend-text { font: 500 13px 'JetBrains Mono', monospace; fill: #0f172a; }
-    .legend-value { font: 700 13px 'JetBrains Mono', monospace; fill: #64748b; }
+    .title { font: 500 13px 'JetBrains Mono', monospace; fill: ${colors.title}; }
+    .legend-text { font: 500 13px 'JetBrains Mono', monospace; fill: ${colors.text}; }
+    .legend-value { font: 700 13px 'JetBrains Mono', monospace; fill: ${colors.title}; }
     .percentage-label { font: 700 10px 'JetBrains Mono', monospace; fill: white; }
-    .total-score-label { font: 500 10px 'JetBrains Mono', monospace; fill: #64748b; }
-    .total-score-value { font: 700 16px 'JetBrains Mono', monospace; fill: #3b82f6; }
-    .no-data { font: 500 12px 'JetBrains Mono', monospace; fill: #94a3b8; }
+    .total-score-label { font: 500 10px 'JetBrains Mono', monospace; fill: ${colors.title}; }
+    .total-score-value { font: 700 16px 'JetBrains Mono', monospace; fill: ${colors.accent}; }
+    .no-data { font: 500 12px 'JetBrains Mono', monospace; fill: ${colors.subText}; }
   </style>
 
   <!-- 배경 -->
-  <rect width="${width}" height="${height}" fill="#ffffff" rx="12" ry="12"/>
+  <rect width="${width}" height="${height}" fill="${colors.background}" rx="12" ry="12"/>
 
   <!-- 타이틀 -->
   <text x="20" y="30" class="title">Most Solved Categories</text>
 
   <!-- 범례 배경 -->
-  <rect x="15" y="55" width="175" height="120" fill="#f8fafc" rx="8" ry="8"/>
+  <rect x="15" y="55" width="175" height="120" fill="${colors.cardBackground}" rx="8" ry="8"/>
 
   <!-- 범례 -->
   <g transform="translate(0, 0)">
@@ -122,7 +144,7 @@ export function generateCategorySvg(stats: TCategoryStats): string {
   </g>
 
   <!-- 테두리 -->
-  <rect x="0.5" y="0.5" width="${width-1}" height="${height-1}" fill="none" stroke="#e2e8f0" stroke-width="1" rx="12" ry="12"/>
+  <rect x="0.5" y="0.5" width="${width-1}" height="${height-1}" fill="none" stroke="${colors.border}" stroke-width="1" rx="12" ry="12"/>
 </svg>
   `;
 } 
