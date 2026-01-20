@@ -48,11 +48,29 @@ jobs:
         vercel-args: '--prod'
 
     - name: Create GitHub Deployment
+      id: deployment
       uses: chrnorm/deployment-action@v2
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         environment: Production
         environment-url: ${{ steps.deploy.outputs.preview-url }}
+
+    - name: Update Deployment Status (Success)
+      if: success()
+      uses: chrnorm/deployment-status@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        deployment-id: ${{ steps.deployment.outputs.deployment_id }}
+        environment-url: ${{ steps.deploy.outputs.preview-url }}
+        state: 'success'
+
+    - name: Update Deployment Status (Failure)
+      if: failure()
+      uses: chrnorm/deployment-status@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        deployment-id: ${{ steps.deployment.outputs.deployment_id }}
+        state: 'failure'
 
   deploy-preview:
     needs: test
@@ -72,8 +90,26 @@ jobs:
         vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
 
     - name: Create GitHub Deployment
+      id: deployment
       uses: chrnorm/deployment-action@v2
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         environment: Preview
-        environment-url: ${{ steps.deploy.outputs.preview-url }} 
+        environment-url: ${{ steps.deploy.outputs.preview-url }}
+
+    - name: Update Deployment Status (Success)
+      if: success()
+      uses: chrnorm/deployment-status@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        deployment-id: ${{ steps.deployment.outputs.deployment_id }}
+        environment-url: ${{ steps.deploy.outputs.preview-url }}
+        state: 'success'
+
+    - name: Update Deployment Status (Failure)
+      if: failure()
+      uses: chrnorm/deployment-status@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        deployment-id: ${{ steps.deployment.outputs.deployment_id }}
+        state: 'failure' 
