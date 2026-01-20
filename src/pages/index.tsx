@@ -1,9 +1,74 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 
 type Theme = 'light' | 'dark';
 type CardType = 'stats' | 'most-solved';
+
+interface DropdownOption<T> {
+  value: T;
+  label: string;
+}
+
+interface CustomDropdownProps<T> {
+  options: DropdownOption<T>[];
+  value: T;
+  onChange: (value: T) => void;
+  placeholder?: string;
+}
+
+function CustomDropdown<T extends string>({ options, value, onChange, placeholder }: CustomDropdownProps<T>) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const selectedOption = options.find(opt => opt.value === value);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div className={styles.dropdown} ref={dropdownRef}>
+      <button
+        type="button"
+        className={`${styles.dropdownTrigger} ${isOpen ? styles.dropdownOpen : ''}`}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span>{selectedOption?.label || placeholder}</span>
+        <svg className={styles.dropdownArrow} viewBox="0 0 20 20" fill="currentColor">
+          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+        </svg>
+      </button>
+      {isOpen && (
+        <ul className={styles.dropdownMenu}>
+          {options.map((option) => (
+            <li
+              key={option.value}
+              className={`${styles.dropdownItem} ${option.value === value ? styles.dropdownItemSelected : ''}`}
+              onClick={() => {
+                onChange(option.value);
+                setIsOpen(false);
+              }}
+            >
+              {option.label}
+              {option.value === value && (
+                <svg className={styles.checkIcon} viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
 
 export default function Home() {
   const [username, setUsername] = useState('');
@@ -11,6 +76,16 @@ export default function Home() {
   const [selectedCard, setSelectedCard] = useState<CardType>('stats');
   const [previewKey, setPreviewKey] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+
+  const cardOptions: DropdownOption<CardType>[] = [
+    { value: 'stats', label: 'Wargame Stats' },
+    { value: 'most-solved', label: 'Most Solved Categories' },
+  ];
+
+  const themeOptions: DropdownOption<Theme>[] = [
+    { value: 'light', label: 'Light' },
+    { value: 'dark', label: 'Dark' },
+  ];
 
   const baseUrl = 'https://dreamhack-readme-stats.vercel.app';
 
@@ -95,29 +170,21 @@ export default function Home() {
             </div>
 
             <div className={styles.inputGroup}>
-              <label htmlFor="cardType">카드 종류</label>
-              <select
-                id="cardType"
+              <label>카드 종류</label>
+              <CustomDropdown
+                options={cardOptions}
                 value={selectedCard}
-                onChange={(e) => setSelectedCard(e.target.value as CardType)}
-                className={styles.selectInput}
-              >
-                <option value="stats">Wargame Stats</option>
-                <option value="most-solved">Most Solved Categories</option>
-              </select>
+                onChange={setSelectedCard}
+              />
             </div>
 
             <div className={styles.inputGroup}>
-              <label htmlFor="theme">테마</label>
-              <select
-                id="theme"
+              <label>테마</label>
+              <CustomDropdown
+                options={themeOptions}
                 value={selectedTheme}
-                onChange={(e) => setSelectedTheme(e.target.value as Theme)}
-                className={styles.selectInput}
-              >
-                <option value="light">Light</option>
-                <option value="dark">Dark</option>
-              </select>
+                onChange={setSelectedTheme}
+              />
             </div>
 
             <button
