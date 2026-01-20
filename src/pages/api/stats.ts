@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { Tstats } from '../../types';
+import { Tstats, Theme } from '../../types';
 import { generateStatsSvg } from '../../utils/generateStatsSvg';
 import {
   getLastRank,
@@ -20,11 +20,14 @@ const measureTime = async <T>(name: string, fn: () => Promise<T>): Promise<T> =>
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   console.time('⏱️ 전체 API 실행 시간');
-  const { username } = req.query;
+  const { username, theme: themeParam } = req.query;
 
   if (!username || typeof username !== 'string') {
     return res.status(400).json({ error: 'Username is required' });
   }
+
+  // 테마 파라미터 검증
+  const theme: Theme = themeParam === 'dark' ? 'dark' : 'light';
 
   try {
     // 개별 API 호출 시간 측정
@@ -64,7 +67,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       wargame_score: wargame.score,
     };
 
-    const svg = generateStatsSvg(stats);
+    const svg = generateStatsSvg(stats, theme);
     console.timeEnd('⏱️ 데이터 가공 및 SVG 생성');
 
     res.setHeader('Content-Type', 'image/svg+xml');

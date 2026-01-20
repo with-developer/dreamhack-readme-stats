@@ -1,8 +1,119 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 
+type Theme = 'light' | 'dark';
+type CardType = 'stats' | 'most-solved';
+
+interface DropdownOption<T> {
+  value: T;
+  label: string;
+}
+
+interface CustomDropdownProps<T> {
+  options: DropdownOption<T>[];
+  value: T;
+  onChange: (value: T) => void;
+  placeholder?: string;
+}
+
+function CustomDropdown<T extends string>({ options, value, onChange, placeholder }: CustomDropdownProps<T>) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const selectedOption = options.find(opt => opt.value === value);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div className={styles.dropdown} ref={dropdownRef}>
+      <button
+        type="button"
+        className={`${styles.dropdownTrigger} ${isOpen ? styles.dropdownOpen : ''}`}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span>{selectedOption?.label || placeholder}</span>
+        <svg className={styles.dropdownArrow} viewBox="0 0 20 20" fill="currentColor">
+          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+        </svg>
+      </button>
+      {isOpen && (
+        <ul className={styles.dropdownMenu}>
+          {options.map((option) => (
+            <li
+              key={option.value}
+              className={`${styles.dropdownItem} ${option.value === value ? styles.dropdownItemSelected : ''}`}
+              onClick={() => {
+                onChange(option.value);
+                setIsOpen(false);
+              }}
+            >
+              {option.label}
+              {option.value === value && (
+                <svg className={styles.checkIcon} viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 export default function Home() {
+  const [username, setUsername] = useState('');
+  const [confirmedUsername, setConfirmedUsername] = useState('');
+  const [selectedTheme, setSelectedTheme] = useState<Theme>('light');
+  const [selectedCard, setSelectedCard] = useState<CardType>('stats');
+  const [previewKey, setPreviewKey] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const cardOptions: DropdownOption<CardType>[] = [
+    { value: 'stats', label: 'Wargame Stats' },
+    { value: 'most-solved', label: 'Most Solved Categories' },
+  ];
+
+  const themeOptions: DropdownOption<Theme>[] = [
+    { value: 'light', label: 'Light' },
+    { value: 'dark', label: 'Dark' },
+  ];
+
+  const baseUrl = 'https://dreamhack-readme-stats.vercel.app';
+
+  const getApiUrl = (card: CardType, theme: Theme, user: string) => {
+    const endpoint = card === 'stats' ? 'stats' : 'most-solved';
+    return `${baseUrl}/api/${endpoint}?username=${user || '사용자명'}&theme=${theme}`;
+  };
+
+  const getPreviewUrl = (card: CardType, theme: Theme, user: string) => {
+    if (!user) return '';
+    const endpoint = card === 'stats' ? 'stats' : 'most-solved';
+    return `/api/${endpoint}?username=${user}&theme=${theme}`;
+  };
+
+  const getMarkdownCode = () => {
+    const altText = selectedCard === 'stats' ? 'Dreamhack Stats' : 'Dreamhack Category Chart';
+    return `![${altText}](${getApiUrl(selectedCard, selectedTheme, confirmedUsername)})`;
+  };
+
+  const getHtmlCode = () => {
+    const altText = selectedCard === 'stats' ? 'Dreamhack Stats' : 'Dreamhack Category Chart';
+    const user = confirmedUsername || '사용자명';
+    return `<a href="https://dreamhack.io/users/${user}" target="_blank" rel="noopener noreferrer">
+  <img src="${getApiUrl(selectedCard, selectedTheme, confirmedUsername)}" alt="${altText}" />
+</a>`;
+  };
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
       alert('코드가 클립보드에 복사되었습니다!');
@@ -11,147 +122,166 @@ export default function Home() {
     });
   };
 
+  const handlePreview = () => {
+    if (!username.trim()) {
+      alert('사용자명을 입력해주세요.');
+      return;
+    }
+    setConfirmedUsername(username);
+    setIsLoading(true);
+    setPreviewKey(prev => prev + 1);
+  };
+
+  const handleImageLoad = () => {
+    setIsLoading(false);
+  };
+
+  const handleImageError = () => {
+    setIsLoading(false);
+  };
+
   return (
     <>
       <Head>
         <title>Dreamhack Readme Stats - GitHub 프로필에 Dreamhack 통계 표시하기</title>
-        <meta name="description" content="GitHub README 프로필에 Dreamhack 워게임 통계를 표시하는 SVG 생성기입니다. 사용자의 해결한 문제 수, 랭킹, 점수 등을 자동으로 업데이트하여 표시합니다." />
-        <meta name="keywords" content="dreamhack, github, readme, stats, wargame, ctf, security, programming" />
+        <meta name="description" content="GitHub README 프로필에 Dreamhack 워게임 통계를 표시하는 SVG 생성기입니다." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="author" content="Dreamhack Readme Stats" />
-        <meta property="og:title" content="Dreamhack Readme Stats" />
-        <meta property="og:description" content="GitHub README 프로필에 Dreamhack 워게임 통계를 표시하는 SVG 생성기" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://dreamhack-readme-stats.vercel.app" />
-        <meta property="og:image" content="https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Dreamhack Readme Stats" />
-        <meta name="twitter:description" content="GitHub README 프로필에 Dreamhack 워게임 통계를 표시하는 SVG 생성기" />
-        <meta name="twitter:image" content="https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="manifest" href="/site.webmanifest" />
-        <meta name="theme-color" content="#0099ff" />
-        <link rel="canonical" href="https://dreamhack-readme-stats.vercel.app" />
       </Head>
+
       <main className={styles.main}>
         <h1 className={styles.title}>Dreamhack Readme Stats</h1>
         <p className={styles.description}>
-          사용자 이름을 입력하여 Dreamhack 워게임 통계를 확인하세요.
+          GitHub README에 Dreamhack 워게임 통계를 표시하세요
         </p>
-        <div className={styles.exampleCard}>
-          <h2>사용 방법:</h2>
-          <div className={styles.codeSection}>
-            <div className={styles.codeHeader}>
-              <h3>Markdown:</h3>
-              <button 
-                className={styles.copyButton}
-                onClick={() => copyToClipboard('![Dreamhack Stats](https://dreamhack-readme-stats.vercel.app/api/stats?username=사용자명)')}
-              >
-                COPY
-              </button>
+
+        {/* 설정 패널 */}
+        <div className={styles.configPanel}>
+          <div className={styles.configRow}>
+            <div className={styles.inputGroup}>
+              <label htmlFor="username">사용자명</label>
+              <input
+                type="text"
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Dreamhack 닉네임 입력"
+                className={styles.textInput}
+              />
             </div>
-            <code className={styles.code}>
-              ![Dreamhack Stats](https://dreamhack-readme-stats.vercel.app/api/stats?username=사용자명)
-            </code>
-          </div>
-          <div className={styles.codeSection}>
-            <div className={styles.codeHeader}>
-              <h3>HTML:</h3>
-              <button 
-                className={styles.copyButton}
-                onClick={() => copyToClipboard(`<a href="https://dreamhack.io/users/사용자명" target="_blank" rel="noopener noreferrer">
-  <img src="https://dreamhack-readme-stats.vercel.app/api/stats?username=사용자명" alt="Dreamhack Stats" />
-</a>`)}
-              >
-                COPY
-              </button>
+
+            <div className={styles.inputGroup}>
+              <label>카드 종류</label>
+              <CustomDropdown
+                options={cardOptions}
+                value={selectedCard}
+                onChange={setSelectedCard}
+              />
             </div>
-            <code className={styles.code}>
-              {`<a href="https://dreamhack.io/users/사용자명" target="_blank" rel="noopener noreferrer">
-  <img src="https://dreamhack-readme-stats.vercel.app/api/stats?username=사용자명" alt="Dreamhack Stats" />
-</a>`}
-            </code>
+
+            <div className={styles.inputGroup}>
+              <label>테마</label>
+              <CustomDropdown
+                options={themeOptions}
+                value={selectedTheme}
+                onChange={setSelectedTheme}
+              />
+            </div>
+
+            <button
+              className={styles.previewButton}
+              onClick={handlePreview}
+              disabled={isLoading}
+            >
+              {isLoading ? '로딩...' : '미리보기'}
+            </button>
           </div>
         </div>
 
-        <div className={styles.example}>
-          <h3>예시:</h3>
-          <a
-            href="https://dreamhack.io/users/weakness"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.exampleLink}
-          >
-            <img
-              src="/api/stats?username=weakness"
-              alt="Dreamhack stats example"
-              width={350}
-              height={170}
-            />
-          </a>
+        {/* 미리보기 */}
+        <div className={styles.previewSection}>
+          <h2>미리보기</h2>
+          <div className={styles.previewContainer}>
+            {confirmedUsername && previewKey > 0 ? (
+              <img
+                key={previewKey}
+                src={getPreviewUrl(selectedCard, selectedTheme, confirmedUsername)}
+                alt="Preview"
+                onLoad={handleImageLoad}
+                onError={handleImageError}
+                className={styles.previewImage}
+              />
+            ) : (
+              <div className={styles.previewPlaceholder}>
+                사용자명을 입력하고 미리보기를 클릭하세요
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className={styles.exampleCard}>
-          <h2>카테고리 차트:</h2>
+        {/* 코드 생성 */}
+        <div className={styles.codePanel}>
+          <h2>{previewKey > 0 ? '생성된 코드' : '예제 코드'}</h2>
+
           <div className={styles.codeSection}>
             <div className={styles.codeHeader}>
-              <h3>Markdown:</h3>
-              <button 
+              <h3>Markdown</h3>
+              <button
                 className={styles.copyButton}
-                onClick={() => copyToClipboard('![Dreamhack Category Chart](https://dreamhack-readme-stats.vercel.app/api/most-solved?username=사용자명)')}
+                onClick={() => copyToClipboard(getMarkdownCode())}
               >
                 COPY
               </button>
             </div>
-            <code className={styles.code}>
-              ![Dreamhack Category Chart](https://dreamhack-readme-stats.vercel.app/api/most-solved?username=사용자명)
-            </code>
+            <code className={styles.code}>{getMarkdownCode()}</code>
           </div>
+
           <div className={styles.codeSection}>
             <div className={styles.codeHeader}>
-              <h3>HTML:</h3>
-              <button 
+              <h3>HTML</h3>
+              <button
                 className={styles.copyButton}
-                onClick={() => copyToClipboard(`<a href="https://dreamhack.io/users/사용자명" target="_blank" rel="noopener noreferrer">
-  <img src="https://dreamhack-readme-stats.vercel.app/api/most-solved?username=사용자명" alt="Dreamhack Category Chart" />
-</a>`)}
+                onClick={() => copyToClipboard(getHtmlCode())}
               >
                 COPY
               </button>
             </div>
-            <code className={styles.code}>
-              {`<a href="https://dreamhack.io/users/사용자명" target="_blank" rel="noopener noreferrer">
-  <img src="https://dreamhack-readme-stats.vercel.app/api/most-solved?username=사용자명" alt="Dreamhack Category Chart" />
-</a>`}
-            </code>
+            <code className={styles.code}>{getHtmlCode()}</code>
           </div>
         </div>
 
-        <div className={styles.example}>
-          <h3>카테고리 차트 예시:</h3>
-          <a 
-            href="https://dreamhack.io/users/weakness" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className={styles.exampleLink}
-          >
-            <img 
-              src="/api/most-solved?username=weakness" 
-              alt="Dreamhack category chart example" 
-              width={350} 
-              height={170} 
-            />
-          </a>
+        {/* 테마 비교 */}
+        <div className={styles.themeComparison}>
+          <h2>테마 비교</h2>
+          <div className={styles.themeGrid}>
+            <div className={styles.themeItem}>
+              <span className={styles.themeLabel}>Light</span>
+              <img
+                src="/api/stats?username=weakness&theme=light"
+                alt="Light theme example"
+                width={350}
+                height={170}
+              />
+            </div>
+            <div className={styles.themeItem}>
+              <span className={styles.themeLabel}>Dark</span>
+              <img
+                src="/api/stats?username=weakness&theme=dark"
+                alt="Dark theme example"
+                width={350}
+                height={170}
+              />
+            </div>
+          </div>
         </div>
 
         <hr className={styles.divider} />
-        
+
         <div className={styles.githubLink}>
-          <a 
-            href="https://github.com/with-developer/dreamhack-readme-stats" 
-            target="_blank" 
+          <a
+            href="https://github.com/with-developer/dreamhack-readme-stats"
+            target="_blank"
             rel="noopener noreferrer"
             className={styles.socialLink}
           >
@@ -164,4 +294,4 @@ export default function Home() {
       </main>
     </>
   );
-} 
+}

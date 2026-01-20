@@ -206,3 +206,251 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Config Panel */
+.configPanel {
+    max-width: 900px;
+    width: 100%;
+    padding: 1.5rem;
+    background: #fafafa;
+    border: 1px solid #eaeaea;
+    border-radius: 10px;
+    margin: 1rem 0;
+}
+
+.configRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 150px;
+}
+
+.inputGroup label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.textInput {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
+}
+
+.textInput:focus {
+    outline: none;
+    border-color: #6e45e2;
+}
+
+/* Custom Dropdown */
+.dropdown {
+    position: relative;
+    width: 100%;
+}
+
+.dropdownTrigger {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+}
+
+.dropdownTrigger:hover {
+    border-color: #bbb;
+}
+
+.dropdownTrigger.dropdownOpen {
+    border-color: #6e45e2;
+    box-shadow: 0 0 0 3px rgba(110, 69, 226, 0.1);
+}
+
+.dropdownArrow {
+    width: 16px;
+    height: 16px;
+    color: #666;
+    transition: transform 0.2s ease;
+}
+
+.dropdownOpen .dropdownArrow {
+    transform: rotate(180deg);
+}
+
+.dropdownMenu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    list-style: none;
+    padding: 4px;
+    margin: 0;
+    z-index: 100;
+    animation: dropdownFadeIn 0.15s ease;
+}
+
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdownItem {
+    padding: 0.65rem 0.75rem;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.15s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dropdownItem:hover {
+    background: #f5f5f5;
+}
+
+.dropdownItemSelected {
+    background: #f0ebff;
+    color: #6e45e2;
+    font-weight: 500;
+}
+
+.dropdownItemSelected:hover {
+    background: #e8e0ff;
+}
+
+.checkIcon {
+    width: 16px;
+    height: 16px;
+    color: #6e45e2;
+}
+
+.previewButton {
+    padding: 0.75rem 1.5rem;
+    background: #6e45e2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+}
+
+.previewButton:hover {
+    background: #5a37c0;
+}
+
+.previewButton:disabled {
+    background: #999;
+    cursor: not-allowed;
+}
+
+/* Preview Section */
+.previewSection {
+    max-width: 900px;
+    width: 100%;
+    margin: 1.5rem 0;
+}
+
+.previewSection h2 {
+    margin: 0 0 1rem 0;
+    font-size: 1.3rem;
+}
+
+.previewContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    padding: 2rem;
+    background: #f5f5f5;
+    border: 1px solid #eaeaea;
+    border-radius: 10px;
+}
+
+.previewImage {
+    max-width: 100%;
+    height: auto;
+}
+
+.previewPlaceholder {
+    color: #999;
+    font-size: 1rem;
+}
+
+/* Code Panel */
+.codePanel {
+    max-width: 900px;
+    width: 100%;
+    padding: 1.5rem;
+    background: #fafafa;
+    border: 1px solid #eaeaea;
+    border-radius: 10px;
+    margin: 1rem 0;
+}
+
+.codePanel h2 {
+    margin: 0 0 1rem 0;
+    font-size: 1.3rem;
+}
+
+/* Theme Comparison */
+.themeComparison {
+    max-width: 900px;
+    width: 100%;
+    margin: 2rem 0;
+}
+
+.themeComparison h2 {
+    margin: 0 0 1rem 0;
+    font-size: 1.3rem;
+}
+
+.themeLabel {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    color: #333;
+}
+
+/* Responsive adjustments for config panel */
+@media (max-width: 600px) {
+    .configRow {
+        flex-direction: column;
+    }
+
+    .inputGroup {
+        width: 100%;
+    }
+
+    .previewButton {
+        width: 100%;
+    }
+}
