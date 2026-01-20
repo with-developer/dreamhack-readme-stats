@@ -72,6 +72,7 @@ function CustomDropdown<T extends string>({ options, value, onChange, placeholde
 
 export default function Home() {
   const [username, setUsername] = useState('');
+  const [confirmedUsername, setConfirmedUsername] = useState('');
   const [selectedTheme, setSelectedTheme] = useState<Theme>('light');
   const [selectedCard, setSelectedCard] = useState<CardType>('stats');
   const [previewKey, setPreviewKey] = useState(0);
@@ -102,14 +103,14 @@ export default function Home() {
 
   const getMarkdownCode = () => {
     const altText = selectedCard === 'stats' ? 'Dreamhack Stats' : 'Dreamhack Category Chart';
-    return `![${altText}](${getApiUrl(selectedCard, selectedTheme, username)})`;
+    return `![${altText}](${getApiUrl(selectedCard, selectedTheme, confirmedUsername)})`;
   };
 
   const getHtmlCode = () => {
     const altText = selectedCard === 'stats' ? 'Dreamhack Stats' : 'Dreamhack Category Chart';
-    const user = username || '사용자명';
+    const user = confirmedUsername || '사용자명';
     return `<a href="https://dreamhack.io/users/${user}" target="_blank" rel="noopener noreferrer">
-  <img src="${getApiUrl(selectedCard, selectedTheme, username)}" alt="${altText}" />
+  <img src="${getApiUrl(selectedCard, selectedTheme, confirmedUsername)}" alt="${altText}" />
 </a>`;
   };
 
@@ -126,6 +127,7 @@ export default function Home() {
       alert('사용자명을 입력해주세요.');
       return;
     }
+    setConfirmedUsername(username);
     setIsLoading(true);
     setPreviewKey(prev => prev + 1);
   };
@@ -201,10 +203,10 @@ export default function Home() {
         <div className={styles.previewSection}>
           <h2>미리보기</h2>
           <div className={styles.previewContainer}>
-            {username && previewKey > 0 ? (
+            {confirmedUsername && previewKey > 0 ? (
               <img
                 key={previewKey}
-                src={getPreviewUrl(selectedCard, selectedTheme, username)}
+                src={getPreviewUrl(selectedCard, selectedTheme, confirmedUsername)}
                 alt="Preview"
                 onLoad={handleImageLoad}
                 onError={handleImageError}
@@ -220,7 +222,7 @@ export default function Home() {
 
         {/* 코드 생성 */}
         <div className={styles.codePanel}>
-          <h2>생성된 코드</h2>
+          <h2>{previewKey > 0 ? '생성된 코드' : '예제 코드'}</h2>
 
           <div className={styles.codeSection}>
             <div className={styles.codeHeader}>
