@@ -61,21 +61,31 @@ export function generateCategorySvg(stats: TCategoryStats, theme: Theme = 'light
       const angleSize = percentage * 360;
       const endAngle = currentAngle + angleSize;
 
-      // 원형 조각 경로
-      const startX = pieCenterX + radius * Math.cos((currentAngle - 90) * Math.PI / 180);
-      const startY = pieCenterY + radius * Math.sin((currentAngle - 90) * Math.PI / 180);
-      const endX = pieCenterX + radius * Math.cos((endAngle - 90) * Math.PI / 180);
-      const endY = pieCenterY + radius * Math.sin((endAngle - 90) * Math.PI / 180);
-      const largeArcFlag = angleSize > 180 ? 1 : 0;
+      let path: string;
 
-      const path = `
-        <path
-          d="M ${pieCenterX} ${pieCenterY} L ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY} Z"
-          fill="${category.color}"
-          stroke="${colors.background}"
-          stroke-width="1"
-        />
-      `;
+      if (angleSize >= 359.99) {
+        // 100%인 경우 arc 대신 원을 그림 (SVG arc는 시작점==끝점이면 렌더링 안됨)
+        path = `
+          <circle cx="${pieCenterX}" cy="${pieCenterY}" r="${radius}" fill="${category.color}"
+            stroke="${colors.background}" stroke-width="1" />
+        `;
+      } else {
+        // 원형 조각 경로
+        const startX = pieCenterX + radius * Math.cos((currentAngle - 90) * Math.PI / 180);
+        const startY = pieCenterY + radius * Math.sin((currentAngle - 90) * Math.PI / 180);
+        const endX = pieCenterX + radius * Math.cos((endAngle - 90) * Math.PI / 180);
+        const endY = pieCenterY + radius * Math.sin((endAngle - 90) * Math.PI / 180);
+        const largeArcFlag = angleSize > 180 ? 1 : 0;
+
+        path = `
+          <path
+            d="M ${pieCenterX} ${pieCenterY} L ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY} Z"
+            fill="${category.color}"
+            stroke="${colors.background}"
+            stroke-width="1"
+          />
+        `;
+      }
 
       // 퍼센트 라벨
       const midAngle = currentAngle + angleSize / 2;
@@ -97,7 +107,7 @@ export function generateCategorySvg(stats: TCategoryStats, theme: Theme = 'light
       legends += `
         <rect x="${legendStartX}" y="${legendY}" width="10" height="10" fill="${category.color}" rx="2" ry="2" />
         <text x="${legendStartX + 16}" y="${legendY + 9}" class="legend-text">${capitalizedName}</text>
-        <text x="${legendStartX + 135}" y="${legendY + 9}" class="legend-value">${percentage}%</text>
+        <text x="${legendStartX + 125}" y="${legendY + 9}" class="legend-value">${percentage}%</text>
       `;
     });
   }
