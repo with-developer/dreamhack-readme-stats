@@ -24,6 +24,11 @@ const themes: Record<Theme, ThemeColors> = {
 export function generateStatsSvg(stats: Tstats, theme: Theme = 'light'): string {
   const colors = themes[theme];
 
+  const rankParts = stats.wargame_rank.split('/');
+  const rankDisplay = rankParts.length === 2
+    ? `<tspan class="stat-value">${rankParts[0]}</tspan><tspan class="rank-total" dx="1">/</tspan><tspan class="rank-total" dx="1">${rankParts[1]}</tspan>`
+    : `<tspan class="stat-value">${stats.wargame_rank}</tspan>`;
+
   return `
 <svg xmlns="http://www.w3.org/2000/svg" width="390" height="190" viewBox="0 0 390 190" fill="none">
   <style>
@@ -32,6 +37,7 @@ export function generateStatsSvg(stats: Tstats, theme: Theme = 'light'): string 
     .user-name { font: 700 28px 'JetBrains Mono', monospace; fill: ${colors.text}; }
     .stat-label { font: 400 10px 'JetBrains Mono', monospace; fill: ${colors.subText}; }
     .stat-value { font: 700 18px 'JetBrains Mono', monospace; fill: ${colors.text}; }
+    .rank-total { font: 700 12px 'JetBrains Mono', monospace; fill: ${colors.title}; }
     .top-label { font: 500 12px 'JetBrains Mono', monospace; fill: ${colors.title}; }
     .top-value { font: 700 20px 'JetBrains Mono', monospace; fill: ${colors.accent}; }
   </style>
@@ -61,7 +67,7 @@ export function generateStatsSvg(stats: Tstats, theme: Theme = 'light'): string 
   <g transform="translate(137, 105)">
     <rect x="0" y="0" width="115" height="70" fill="${colors.cardBackground}" rx="8" ry="8"/>
     <text x="57.5" y="16" class="stat-label" text-anchor="middle">Rank</text>
-    <text x="57.5" y="48" class="stat-value" text-anchor="middle">${stats.wargame_rank}</text>
+    <text x="57.5" y="48" text-anchor="middle">${rankDisplay}</text>
   </g>
 
   <g transform="translate(259, 105)">
