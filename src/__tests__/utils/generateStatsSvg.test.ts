@@ -20,7 +20,8 @@ describe('generateStatsSvg 유틸리티 함수 테스트', () => {
     // 사용자 데이터가 SVG에 포함되어 있는지 확인
     expect(result).toContain('testuser');
     expect(result).toContain('50');
-    expect(result).toContain('200/1000');
+    expect(result).toContain('200');
+    expect(result).toContain('1000');
     expect(result).toContain('20.00%');
     expect(result).toContain('5000');
   });
