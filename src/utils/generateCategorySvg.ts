@@ -43,8 +43,8 @@ export function generateCategorySvg(stats: TCategoryStats, theme: Theme = 'light
   let currentAngle = 0;
 
   const legendStartX = 25;
-  const legendStartY = 75;
-  const legendItemHeight = 22;
+  const legendStartY = 64;
+  const legendItemHeight = 23;
   const maxLegendItems = 5;
 
   // 카테고리가 없는 경우
@@ -140,7 +140,7 @@ export function generateCategorySvg(stats: TCategoryStats, theme: Theme = 'light
   <text x="20" y="30" class="title">Most Solved Categories</text>
 
   <!-- 범례 배경 -->
-  <rect x="15" y="55" width="175" height="120" fill="${colors.cardBackground}" rx="8" ry="8"/>
+  <rect x="15" y="50" width="175" height="130" fill="${colors.cardBackground}" rx="8" ry="8"/>
 
   <!-- 범례 -->
   <g transform="translate(0, 0)">
