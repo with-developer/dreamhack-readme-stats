@@ -110,3 +110,5 @@ http://localhost:3000 에서 확인
 ## License
 
 MIT License
+
+단, 카드에 임베드되는 JetBrains Mono 폰트(`src/utils/fonts/`)는 [SIL Open Font License 1.1](src/utils/fonts/OFL.txt)을 따릅니다.
