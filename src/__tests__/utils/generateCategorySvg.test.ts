@@ -146,4 +146,21 @@ describe('generateCategorySvg 유틸리티 함수 테스트', () => {
     expect(result).toContain('fill="#21262d"'); // cardBackground
     expect(result).toContain('stroke="#30363d"'); // border
   });
+
+  it('폰트를 외부에서 불러오지 않고 SVG에 임베드해야 함', () => {
+    const mockStats: TCategoryStats = {
+      nickname: 'weakness',
+      total_score: 5000,
+      categories: [
+        { name: 'web', score: 2000, rank: 50, color: '#ff6b6b' }
+      ]
+    };
+
+    const result = generateCategorySvg(mockStats);
+
+    // <img>로 렌더링되는 SVG는 외부 리소스(@import)를 불러올 수 없음
+    expect(result).not.toContain('@import');
+    expect(result).toContain("font-family: 'JetBrains Mono'");
+    expect(result).toContain('url(data:font/woff2;base64,');
+  });
 }); 
