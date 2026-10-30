@@ -1,4 +1,5 @@
 import { Tstats, Theme, ThemeColors } from '../types';
+import { jetBrainsMonoFontFace } from './fonts/jetbrainsMono';
 
 const themes: Record<Theme, ThemeColors> = {
   light: {
@@ -32,7 +33,7 @@ export function generateStatsSvg(stats: Tstats, theme: Theme = 'light'): string 
   return `
 <svg xmlns="http://www.w3.org/2000/svg" width="390" height="190" viewBox="0 0 390 190" fill="none">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;display=swap');
+    ${jetBrainsMonoFontFace}
     .title { font: 500 13px 'JetBrains Mono', monospace; fill: ${colors.title}; }
     .user-name { font: 700 28px 'JetBrains Mono', monospace; fill: ${colors.text}; }
     .stat-label { font: 400 10px 'JetBrains Mono', monospace; fill: ${colors.subText}; }

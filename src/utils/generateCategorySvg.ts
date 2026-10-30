@@ -1,4 +1,5 @@
 import { TCategoryStats, Theme, ThemeColors } from '../types';
+import { jetBrainsMonoFontFace } from './fonts/jetbrainsMono';
 
 const themes: Record<Theme, ThemeColors> = {
   light: {
@@ -123,7 +124,7 @@ export function generateCategorySvg(stats: TCategoryStats, theme: Theme = 'light
   return `
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;display=swap');
+    ${jetBrainsMonoFontFace}
     .title { font: 500 13px 'JetBrains Mono', monospace; fill: ${colors.title}; }
     .legend-text { font: 500 13px 'JetBrains Mono', monospace; fill: ${colors.text}; }
     .legend-value { font: 700 13px 'JetBrains Mono', monospace; fill: ${colors.title}; }
