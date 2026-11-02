@@ -2,6 +2,18 @@ import { generateCategorySvg } from '../../utils/generateCategorySvg';
 import { TCategoryStats } from '../../types';
 
 describe('generateCategorySvg 유틸리티 함수 테스트', () => {
+  it('카테고리 이름의 특수 문자를 이스케이프해야 함', () => {
+    const result = generateCategorySvg({
+      nickname: 'weakness',
+      total_score: 100,
+      categories: [{ name: 'web&<misc>', score: 100, rank: 1, color: '#ff6b6b' }],
+    });
+
+    const doc = new DOMParser().parseFromString(result.trim(), 'image/svg+xml');
+    expect(doc.getElementsByTagName('parsererror')).toHaveLength(0);
+    expect(doc.querySelector('.legend-text')?.textContent).toBe('Web&<misc>');
+  });
+
   it('유효한 카테고리 데이터로 SVG를 생성해야 함', () => {
     const mockStats: TCategoryStats = {
       nickname: 'weakness',

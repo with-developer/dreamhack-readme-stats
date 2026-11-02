@@ -1,7 +1,15 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { TCategoryData, TCategoryStats, Theme } from '../../types';
 import { generateCategorySvg } from '../../utils/generateCategorySvg';
+import { generateErrorSvg, errorCards } from '../../utils/generateErrorSvg';
+import { sendSvg } from '../../utils/svg';
 import { getUserId, getUserData } from '../../utils/dreamhack';
+
+// 처음 조회하는 닉네임은 Dreamhack 검색이 여러 번 필요해 기본 10초를 넘을 수 있음
+// (요청당 타임아웃 10초 × 최대 5단계 + 여유, Hobby 플랜 최대값)
+export const config = { maxDuration: 60 };
+
+const CARD_TITLE = 'Most Solved Categories';
 
 // 성능 측정을 위한 유틸리티 함수
 const measureTime = async <T>(name: string, fn: () => Promise<T>): Promise<T> => {
@@ -30,30 +38,30 @@ const defaultColors = [
 ];
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  console.time('⏱️ 전체 API 실행 시간');
   const { username, theme: themeParam } = req.query;
-
-  if (!username || typeof username !== 'string') {
-    return res.status(400).json({ error: 'Username is required' });
-  }
 
   // 테마 파라미터 검증
   const theme: Theme = themeParam === 'dark' ? 'dark' : 'light';
 
+  if (!username || typeof username !== 'string') {
+    return sendSvg(res, generateErrorSvg(errorCards.missingUsername(CARD_TITLE), theme));
+  }
+
+  console.time('⏱️ 전체 API 실행 시간');
   try {
     // 개별 API 호출 시간 측정
-    const userId = await measureTime('getUserId', () => getUserId(username as string));
+    const userId = await measureTime('getUserId', () => getUserId(username));
 
     if (!userId) {
       console.timeEnd('⏱️ 전체 API 실행 시간');
-      return res.status(400).json({ error: 'User not found' });
+      return sendSvg(res, generateErrorSvg(errorCards.userNotFound(CARD_TITLE, username), theme));
     }
 
     // username을 함께 전달하여 캐시된 ID가 유효하지 않을 경우 재시도할 수 있도록 함
-    const userData = await measureTime('getUserData', () => getUserData(userId, username as string));
+    const userData = await measureTime('getUserData', () => getUserData(userId, username));
     if (!userData) {
       console.timeEnd('⏱️ 전체 API 실행 시간');
-      return res.status(400).json({ error: 'User information cannot be read.' });
+      return sendSvg(res, generateErrorSvg(errorCards.fetchFailed(CARD_TITLE), theme));
     }
 
     console.time('⏱️ 데이터 가공 및 SVG 생성');
@@ -74,10 +82,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       };
 
       const svg = generateCategorySvg(emptyStats, theme);
-      res.setHeader('Content-Type', 'image/svg+xml');
-      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      console.timeEnd('⏱️ 데이터 가공 및 SVG 생성');
       console.timeEnd('⏱️ 전체 API 실행 시간');
-      return res.send(svg);
+      return sendSvg(res, svg);
     }
     
     // 카테고리 데이터가 있는 경우 가공
@@ -105,13 +112,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const svg = generateCategorySvg(categoryStats, theme);
     console.timeEnd('⏱️ 데이터 가공 및 SVG 생성');
 
-    res.setHeader('Content-Type', 'image/svg+xml');
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     console.timeEnd('⏱️ 전체 API 실행 시간');
-    return res.send(svg);
+    return sendSvg(res, svg);
   } catch (error) {
     console.error(error);
     console.timeEnd('⏱️ 전체 API 실행 시간');
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return sendSvg(res, generateErrorSvg(errorCards.fetchFailed(CARD_TITLE), theme));
   }
 } 

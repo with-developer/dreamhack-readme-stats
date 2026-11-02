@@ -21,6 +21,7 @@
 ## Quick Start
 
 README에 아래 코드를 추가하고 `사용자명`을 본인의 Dreamhack 닉네임으로 변경하세요.
+닉네임에 `&`, `#`, `+`, 공백 같은 특수문자가 있다면 [메인 페이지](https://dreamhack-readme-stats.vercel.app)에서 코드를 생성하세요. URL에 맞게 자동으로 인코딩됩니다.
 
 ### Wargame Stats
 
@@ -34,9 +35,9 @@ README에 아래 코드를 추가하고 `사용자명`을 본인의 Dreamhack �
 ![Dreamhack Categories](https://dreamhack-readme-stats.vercel.app/api/most-solved?username=사용자명)
 ```
 
-> 💡 클릭 시 Dreamhack 프로필로 이동하게 하려면 HTML 사용:
+> 💡 클릭 시 Dreamhack 프로필로 이동하게 하려면 HTML 사용 (`사용자ID`는 프로필 주소 `https://dreamhack.io/users/12345`의 숫자이며, 메인 페이지에서 미리보기하면 자동으로 채워집니다):
 > ```html
-> <a href="https://dreamhack.io/users/사용자명">
+> <a href="https://dreamhack.io/users/사용자ID">
 >   <img src="https://dreamhack-readme-stats.vercel.app/api/stats?username=사용자명" />
 > </a>
 > ```

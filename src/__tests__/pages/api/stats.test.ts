@@ -123,26 +123,23 @@ describe('stats API 엔드포인트 테스트', () => {
     );
   });
 
-  it('사용자 이름이 없을 때 400 에러를 반환해야 함', async () => {
-    // HTTP 요청 모킹 (사용자 이름 없음)
+  it('사용자 이름이 없을 때 안내 카드를 반환해야 함', async () => {
     const { req, res } = createMocks({
       method: 'GET',
       query: {},
     });
 
-    // API 핸들러 호출
     await handler(req, res);
 
-    // 응답 검증
-    expect(res._getStatusCode()).toBe(400);
-    expect(JSON.parse(res._getData())).toEqual({ error: 'Username is required' });
+    expect(res._getStatusCode()).toBe(200);
+    expect(res._getHeaders()).toHaveProperty('content-type', 'image/svg+xml');
+    expect(res._getHeaders()).toHaveProperty('cache-control', 'no-cache, no-store, must-revalidate');
+    expect(res._getData()).toContain('Missing username');
   });
 
-  it('사용자를 찾을 수 없을 때 400 에러를 반환해야 함', async () => {
-    // 모킹된 함수 구현 (사용자 ID가 null)
+  it('사용자를 찾을 수 없을 때 안내 카드를 반환해야 함', async () => {
     (dreamhackUtils.getUserId as jest.Mock).mockResolvedValueOnce(null);
 
-    // HTTP 요청 모킹
     const { req, res } = createMocks({
       method: 'GET',
       query: {
@@ -150,20 +147,37 @@ describe('stats API 엔드포인트 테스트', () => {
       },
     });
 
-    // API 핸들러 호출
     await handler(req, res);
 
-    // 응답 검증
-    expect(res._getStatusCode()).toBe(400);
-    expect(JSON.parse(res._getData())).toEqual({ error: 'User not found' });
+    expect(res._getStatusCode()).toBe(200);
+    expect(res._getHeaders()).toHaveProperty('content-type', 'image/svg+xml');
+    expect(res._getHeaders()).toHaveProperty('cache-control', 'no-cache, no-store, must-revalidate');
+    expect(res._getData()).toContain('User not found');
+    expect(res._getData()).toContain('nonexistentuser');
+    // 사용자가 없으면 마지막 랭크는 조회하지 않음
+    expect(dreamhackUtils.getLastRank).not.toHaveBeenCalled();
   });
 
-  it('마지막 랭크를 가져올 수 없을 때 500 에러를 반환해야 함', async () => {
-    // 모킹된 함수 구현
+  it('안내 카드에 표시하는 닉네임을 이스케이프해야 함', async () => {
+    (dreamhackUtils.getUserId as jest.Mock).mockResolvedValueOnce(null);
+
+    const { req, res } = createMocks({
+      method: 'GET',
+      query: {
+        username: '<script>alert(1)</script>',
+      },
+    });
+
+    await handler(req, res);
+
+    expect(res._getData()).not.toContain('<script>');
+    expect(res._getData()).toContain('&lt;script&gt;');
+  });
+
+  it('마지막 랭크를 가져올 수 없을 때 오류 카드를 반환해야 함', async () => {
     (dreamhackUtils.getUserId as jest.Mock).mockResolvedValueOnce(123);
     (dreamhackUtils.getLastRank as jest.Mock).mockResolvedValueOnce(null);
 
-    // HTTP 요청 모킹
     const { req, res } = createMocks({
       method: 'GET',
       query: {
@@ -171,22 +185,20 @@ describe('stats API 엔드포인트 테스트', () => {
       },
     });
 
-    // API 핸들러 호출
     await handler(req, res);
 
-    // 응답 검증
-    expect(res._getStatusCode()).toBe(500);
-    expect(JSON.parse(res._getData())).toEqual({ error: 'Failed to fetch last rank' });
+    expect(res._getStatusCode()).toBe(200);
+    expect(res._getHeaders()).toHaveProperty('content-type', 'image/svg+xml');
+    expect(res._getHeaders()).toHaveProperty('cache-control', 'no-cache, no-store, must-revalidate');
+    expect(res._getData()).toContain('Failed to load stats');
   });
 
-  it('사용자 데이터를 가져올 수 없을 때 400 에러를 반환해야 함', async () => {
-    // 모킹된 함수 구현
+  it('사용자 데이터를 가져올 수 없을 때 오류 카드를 반환해야 함', async () => {
     const username = 'testuser';
     (dreamhackUtils.getUserId as jest.Mock).mockResolvedValueOnce(123);
     (dreamhackUtils.getLastRank as jest.Mock).mockResolvedValueOnce(1000);
     (dreamhackUtils.getUserData as jest.Mock).mockResolvedValueOnce(null);
 
-    // HTTP 요청 모킹
     const { req, res } = createMocks({
       method: 'GET',
       query: {
@@ -194,20 +206,18 @@ describe('stats API 엔드포인트 테스트', () => {
       },
     });
 
-    // API 핸들러 호출
     await handler(req, res);
 
-    // 응답 검증
-    expect(res._getStatusCode()).toBe(400);
-    expect(JSON.parse(res._getData())).toEqual({ error: 'User information cannot be read.' });
+    expect(res._getStatusCode()).toBe(200);
+    expect(res._getHeaders()).toHaveProperty('content-type', 'image/svg+xml');
+    expect(res._getHeaders()).toHaveProperty('cache-control', 'no-cache, no-store, must-revalidate');
+    expect(res._getData()).toContain('Failed to load stats');
     expect(dreamhackUtils.getUserData).toHaveBeenCalledWith(123, username);
   });
 
-  it('예외 발생 시 500 에러를 반환해야 함', async () => {
-    // 모킹된 함수 구현 (예외 발생)
+  it('예외 발생 시 오류 카드를 반환해야 함', async () => {
     (dreamhackUtils.getUserId as jest.Mock).mockRejectedValueOnce(new Error('테스트 에러'));
 
-    // HTTP 요청 모킹
     const { req, res } = createMocks({
       method: 'GET',
       query: {
@@ -215,11 +225,11 @@ describe('stats API 엔드포인트 테스트', () => {
       },
     });
 
-    // API 핸들러 호출
     await handler(req, res);
 
-    // 응답 검증
-    expect(res._getStatusCode()).toBe(500);
-    expect(JSON.parse(res._getData())).toEqual({ error: 'Internal Server Error' });
+    expect(res._getStatusCode()).toBe(200);
+    expect(res._getHeaders()).toHaveProperty('content-type', 'image/svg+xml');
+    expect(res._getHeaders()).toHaveProperty('cache-control', 'no-cache, no-store, must-revalidate');
+    expect(res._getData()).toContain('Failed to load stats');
   });
 }); 
