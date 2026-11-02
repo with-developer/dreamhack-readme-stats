@@ -1,0 +1,7 @@
+{
+  "extends": ["next/core-web-vitals", "prettier"],
+  "rules": {
+    // 페이지의 <img>는 모두 API가 동적으로 만드는 SVG 카드라 next/image 최적화 대상이 아님
+    "@next/next/no-img-element": "off"
+  }
+}

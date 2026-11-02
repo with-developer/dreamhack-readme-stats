@@ -11,8 +11,5 @@ module.exports = {
             tsconfig: 'tsconfig.json',
         }],
     },
-    transformIgnorePatterns: [
-        '/node_modules/(?!node-fetch).+\\.js$'
-    ],
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
 }; 
