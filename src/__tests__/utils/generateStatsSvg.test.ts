@@ -26,19 +26,16 @@ describe('generateStatsSvg 유틸리티 함수 테스트', () => {
     expect(result).toContain('5000');
   });
 
-  it('특수 문자가 포함된 사용자 이름을 올바르게 처리해야 함', () => {
-    const specialStats: Tstats = {
-      nickname: 'test<user>',
-      wargame_solved: 50,
-      wargame_rank: '200/1000',
-      wargameRankPercentage: '20.00',
-      wargame_score: 5000
-    };
+  it('특수 문자가 포함된 사용자 이름을 이스케이프해 올바른 SVG를 만들어야 함', () => {
+    for (const nickname of ['Try&Catch', 'DUck_<', 'test<user>', '<script>alert(1)</script>', 'system("/bin/sh")']) {
+      const result = generateStatsSvg({ ...mockStats, nickname });
 
-    const result = generateStatsSvg(specialStats);
-    
-    // 특수 문자가 포함된 사용자 이름이 SVG에 포함되어 있는지 확인
-    expect(result).toContain('test<user>');
+      // XML로 파싱되고, 닉네임이 태그가 아닌 텍스트로 들어가야 함
+      const doc = new DOMParser().parseFromString(result.trim(), 'image/svg+xml');
+      expect(doc.getElementsByTagName('parsererror')).toHaveLength(0);
+      expect(doc.getElementsByTagName('script')).toHaveLength(0);
+      expect(doc.querySelector('.user-name')?.textContent).toBe(nickname);
+    }
   });
 
   it('긴 사용자 이름을 처리할 수 있어야 함', () => {

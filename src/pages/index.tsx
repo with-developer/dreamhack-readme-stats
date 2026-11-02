@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
+import { encodeUsername } from '../utils/encodeUsername';
 
 type Theme = 'light' | 'dark';
 type CardType = 'stats' | 'most-solved';
@@ -77,6 +78,21 @@ export default function Home() {
   const [selectedCard, setSelectedCard] = useState<CardType>('stats');
   const [previewKey, setPreviewKey] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  // 닉네임별 프로필 주소 (찾지 못하면 null). 늦게 도착한 다른 닉네임의 응답이 현재 결과를 덮어쓰지 않도록 닉네임별로 보관
+  const [profileUrls, setProfileUrls] = useState<Map<string, string | null>>(new Map());
+  const profileUrl = profileUrls.get(confirmedUsername) ?? null;
+
+  // Dreamhack 프로필 주소는 닉네임이 아닌 숫자 ID를 사용하므로 미리보기한 닉네임의 ID를 조회
+  const loadProfileUrl = (user: string) => {
+    fetch(`/api/user-id?username=${encodeUsername(user)}`)
+      .then((response) => {
+        if (response.status === 404) return null;
+        if (!response.ok) throw new Error(`user-id ${response.status}`);
+        return response.json();
+      })
+      .then((data) => setProfileUrls((prev) => new Map(prev).set(user, data?.profileUrl ?? null)))
+      .catch(() => {});
+  };
 
   const cardOptions: DropdownOption<CardType>[] = [
     { value: 'stats', label: 'Wargame Stats' },
@@ -92,13 +108,13 @@ export default function Home() {
 
   const getApiUrl = (card: CardType, theme: Theme, user: string) => {
     const endpoint = card === 'stats' ? 'stats' : 'most-solved';
-    return `${baseUrl}/api/${endpoint}?username=${user || '사용자명'}&theme=${theme}`;
+    return `${baseUrl}/api/${endpoint}?username=${user ? encodeUsername(user) : '사용자명'}&theme=${theme}`;
   };
 
   const getPreviewUrl = (card: CardType, theme: Theme, user: string) => {
     if (!user) return '';
     const endpoint = card === 'stats' ? 'stats' : 'most-solved';
-    return `/api/${endpoint}?username=${user}&theme=${theme}`;
+    return `/api/${endpoint}?username=${encodeUsername(user)}&theme=${theme}`;
   };
 
   const getMarkdownCode = () => {
@@ -108,8 +124,7 @@ export default function Home() {
 
   const getHtmlCode = () => {
     const altText = selectedCard === 'stats' ? 'Dreamhack Stats' : 'Dreamhack Category Chart';
-    const user = confirmedUsername || '사용자명';
-    return `<a href="https://dreamhack.io/users/${user}" target="_blank" rel="noopener noreferrer">
+    return `<a href="${profileUrl || 'https://dreamhack.io/users/사용자ID'}" target="_blank" rel="noopener noreferrer">
   <img src="${getApiUrl(selectedCard, selectedTheme, confirmedUsername)}" alt="${altText}" />
 </a>`;
   };
@@ -127,13 +142,17 @@ export default function Home() {
       alert('사용자명을 입력해주세요.');
       return;
     }
-    setConfirmedUsername(username);
+    setConfirmedUsername(username.trim());
     setIsLoading(true);
     setPreviewKey(prev => prev + 1);
   };
 
   const handleImageLoad = () => {
     setIsLoading(false);
+    // 카드 요청이 서버 캐시를 채운 뒤에 조회해야 Dreamhack 검색이 중복되지 않음
+    if (!profileUrls.has(confirmedUsername)) {
+      loadProfileUrl(confirmedUsername);
+    }
   };
 
   const handleImageError = () => {
@@ -248,6 +267,11 @@ export default function Home() {
               </button>
             </div>
             <code className={styles.code}>{getHtmlCode()}</code>
+            {!profileUrl && (
+              <p className={styles.codeHint}>
+                사용자ID는 Dreamhack 프로필 주소(https://dreamhack.io/users/12345)의 숫자입니다. 미리보기에 성공하면 자동으로 채워집니다.
+              </p>
+            )}
           </div>
         </div>
 

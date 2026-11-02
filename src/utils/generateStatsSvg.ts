@@ -1,34 +1,14 @@
-import { Tstats, Theme, ThemeColors } from '../types';
+import { Tstats, Theme } from '../types';
+import { escapeXml, themes } from './svg';
 import { jetBrainsMonoFontFace } from './fonts/jetbrainsMono';
-
-const themes: Record<Theme, ThemeColors> = {
-  light: {
-    background: '#ffffff',
-    cardBackground: '#f8fafc',
-    border: '#e2e8f0',
-    title: '#64748b',
-    text: '#0f172a',
-    subText: '#94a3b8',
-    accent: '#3b82f6',
-  },
-  dark: {
-    background: '#0d1117',
-    cardBackground: '#21262d',
-    border: '#30363d',
-    title: '#8b949e',
-    text: '#e6edf3',
-    subText: '#7d8590',
-    accent: '#58a6ff',
-  },
-};
 
 export function generateStatsSvg(stats: Tstats, theme: Theme = 'light'): string {
   const colors = themes[theme];
 
   const rankParts = stats.wargame_rank.split('/');
   const rankDisplay = rankParts.length === 2
-    ? `<tspan class="stat-value">${rankParts[0]}</tspan><tspan class="rank-total" dx="1">/</tspan><tspan class="rank-total" dx="1">${rankParts[1]}</tspan>`
-    : `<tspan class="stat-value">${stats.wargame_rank}</tspan>`;
+    ? `<tspan class="stat-value">${escapeXml(rankParts[0])}</tspan><tspan class="rank-total" dx="1">/</tspan><tspan class="rank-total" dx="1">${escapeXml(rankParts[1])}</tspan>`
+    : `<tspan class="stat-value">${escapeXml(stats.wargame_rank)}</tspan>`;
 
   return `
 <svg xmlns="http://www.w3.org/2000/svg" width="390" height="190" viewBox="0 0 390 190" fill="none">
@@ -50,19 +30,19 @@ export function generateStatsSvg(stats: Tstats, theme: Theme = 'light'): string 
   <text x="20" y="30" class="title">Dreamhack Wargame Stats</text>
 
   <!-- 닉네임 (타이틀과 하단 박스 중앙) -->
-  <text x="20" y="75" class="user-name">${stats.nickname}</text>
+  <text x="20" y="75" class="user-name">${escapeXml(stats.nickname)}</text>
 
   <!-- TOP % (우측, 닉네임과 동일 높이) -->
   <g transform="translate(280, 26)">
     <text x="45" y="18" class="top-label" text-anchor="middle">TOP</text>
-    <text x="45" y="45" class="top-value" text-anchor="middle">${stats.wargameRankPercentage}%</text>
+    <text x="45" y="45" class="top-value" text-anchor="middle">${escapeXml(stats.wargameRankPercentage)}%</text>
   </g>
 
   <!-- 스탯 (하단 가로 배치, 중앙 정렬) -->
   <g transform="translate(15, 105)">
     <rect x="0" y="0" width="115" height="70" fill="${colors.cardBackground}" rx="8" ry="8"/>
     <text x="57.5" y="16" class="stat-label" text-anchor="middle">Solved Challenges</text>
-    <text x="57.5" y="48" class="stat-value" text-anchor="middle">${stats.wargame_solved}</text>
+    <text x="57.5" y="48" class="stat-value" text-anchor="middle">${escapeXml(stats.wargame_solved)}</text>
   </g>
 
   <g transform="translate(137, 105)">
@@ -74,7 +54,7 @@ export function generateStatsSvg(stats: Tstats, theme: Theme = 'light'): string 
   <g transform="translate(259, 105)">
     <rect x="0" y="0" width="115" height="70" fill="${colors.cardBackground}" rx="8" ry="8"/>
     <text x="57.5" y="16" class="stat-label" text-anchor="middle">Score</text>
-    <text x="57.5" y="48" class="stat-value" text-anchor="middle">${stats.wargame_score}</text>
+    <text x="57.5" y="48" class="stat-value" text-anchor="middle">${escapeXml(stats.wargame_score)}</text>
   </g>
 
   <!-- 테두리 -->

@@ -74,6 +74,8 @@ export async function saveUserIdToCache(username: string, userId: number): Promi
   
   try {
     await redis.set(`userId:${username}`, userId);
+    // 동시에 실행된 다른 검색이 남긴 미존재 기록이 404 재시도를 막지 않도록 함께 삭제
+    await redis.del(`userNotFound:${username}`);
     console.log(`✅ Redis에 사용자 ID 저장 완료: ${username} -> ${userId}`);
   } catch (error) {
     console.error('Redis에 사용자 ID 저장 실패:', error);
@@ -97,6 +99,43 @@ export async function getUserIdFromCache(username: string): Promise<number | nul
   } catch (error) {
     console.error('Redis에서 사용자 ID 조회 실패:', error);
     return null;
+  }
+}
+
+// Redis에서 사용자 ID 삭제 (캐시된 ID가 더 이상 유효하지 않을 때)
+export async function deleteUserIdFromCache(username: string): Promise<void> {
+  if (!redis) return;
+
+  try {
+    await redis.del(`userId:${username}`);
+    console.log(`🗑️ Redis에서 사용자 ID 삭제 완료: ${username}`);
+  } catch (error) {
+    console.error('Redis에서 사용자 ID 삭제 실패:', error);
+  }
+}
+
+// 찾지 못한 닉네임을 잠시 기록해, README가 조회될 때마다 느린 Dreamhack 검색을 반복하지 않도록 함
+const USER_NOT_FOUND_TTL_SECONDS = 600;
+
+export async function saveUserNotFoundToCache(username: string): Promise<void> {
+  if (!redis) return;
+
+  try {
+    await redis.set(`userNotFound:${username}`, '1', 'EX', USER_NOT_FOUND_TTL_SECONDS);
+    console.log(`✅ Redis에 미존재 사용자 저장 완료: ${username}`);
+  } catch (error) {
+    console.error('Redis에 미존재 사용자 저장 실패:', error);
+  }
+}
+
+export async function isUserNotFoundCached(username: string): Promise<boolean> {
+  if (!redis) return false;
+
+  try {
+    return (await redis.get(`userNotFound:${username}`)) !== null;
+  } catch (error) {
+    console.error('Redis에서 미존재 사용자 조회 실패:', error);
+    return false;
   }
 }
 
