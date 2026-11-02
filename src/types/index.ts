@@ -54,6 +54,7 @@ export interface TgetLastRankResponse {
 }
 
 export interface TUserRankingResponse {
+  count: number;
   results: TUserRankingResult[];
 }
 
@@ -76,6 +77,12 @@ export interface TCategoryStats {
 }
 
 export type Theme = 'light' | 'dark';
+
+export interface TErrorCard {
+  title: string;
+  message: string;
+  details: string[];
+}
 
 export interface ThemeColors {
   background: string;

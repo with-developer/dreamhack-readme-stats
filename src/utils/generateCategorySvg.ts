@@ -1,26 +1,6 @@
-import { TCategoryStats, Theme, ThemeColors } from '../types';
+import { TCategoryStats, Theme } from '../types';
+import { escapeXml, themes } from './svg';
 import { jetBrainsMonoFontFace } from './fonts/jetbrainsMono';
-
-const themes: Record<Theme, ThemeColors> = {
-  light: {
-    background: '#ffffff',
-    cardBackground: '#f8fafc',
-    border: '#e2e8f0',
-    title: '#64748b',
-    text: '#0f172a',
-    subText: '#94a3b8',
-    accent: '#3b82f6',
-  },
-  dark: {
-    background: '#0d1117',
-    cardBackground: '#21262d',
-    border: '#30363d',
-    title: '#8b949e',
-    text: '#e6edf3',
-    subText: '#7d8590',
-    accent: '#58a6ff',
-  },
-};
 
 export function generateCategorySvg(stats: TCategoryStats, theme: Theme = 'light'): string {
   const colors = themes[theme];
@@ -107,7 +87,7 @@ export function generateCategorySvg(stats: TCategoryStats, theme: Theme = 'light
       const capitalizedName = category.name.charAt(0).toUpperCase() + category.name.slice(1);
       legends += `
         <rect x="${legendStartX}" y="${legendY}" width="10" height="10" fill="${category.color}" rx="2" ry="2" />
-        <text x="${legendStartX + 16}" y="${legendY + 9}" class="legend-text">${capitalizedName}</text>
+        <text x="${legendStartX + 16}" y="${legendY + 9}" class="legend-text">${escapeXml(capitalizedName)}</text>
         <text x="${legendStartX + 125}" y="${legendY + 9}" class="legend-value">${percentage}%</text>
       `;
     });
@@ -117,7 +97,7 @@ export function generateCategorySvg(stats: TCategoryStats, theme: Theme = 'light
   const centerCircle = `
     <circle cx="${pieCenterX}" cy="${pieCenterY}" r="${radius * 0.45}" fill="${colors.background}" />
     <text x="${pieCenterX}" y="${pieCenterY - 6}" text-anchor="middle" class="total-score-label">Total</text>
-    <text x="${pieCenterX}" y="${pieCenterY + 12}" text-anchor="middle" class="total-score-value">${totalScore}</text>
+    <text x="${pieCenterX}" y="${pieCenterY + 12}" text-anchor="middle" class="total-score-value">${escapeXml(totalScore)}</text>
   `;
 
   // SVG 구조 반환

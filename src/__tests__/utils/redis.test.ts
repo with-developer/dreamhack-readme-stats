@@ -1,4 +1,11 @@
-import { saveUserIdToCache, getUserIdFromCache, __setRedisClientForTesting } from '../../utils/redis';
+import {
+  saveUserIdToCache,
+  getUserIdFromCache,
+  deleteUserIdFromCache,
+  saveUserNotFoundToCache,
+  isUserNotFoundCached,
+  __setRedisClientForTesting,
+} from '../../utils/redis';
 import Redis from 'ioredis';
 
 // 테스트 환경 설정 (process.env.NODE_ENV는 jest에 의해 'test'로 설정됨)
@@ -11,6 +18,7 @@ jest.mock('ioredis');
 const mockRedis = new Redis() as jest.Mocked<Redis>;
 mockRedis.get = jest.fn();
 mockRedis.set = jest.fn();
+mockRedis.del = jest.fn();
 
 // 테스트용 Redis 클라이언트 설정
 beforeAll(() => {
@@ -31,6 +39,7 @@ describe('Redis 유틸리티 함수 테스트', () => {
       await saveUserIdToCache('testuser', 12345);
       
       expect(mockRedis.set).toHaveBeenCalledWith('userId:testuser', 12345);
+      expect(mockRedis.del).toHaveBeenCalledWith('userNotFound:testuser');
       expect(console.log).toHaveBeenCalledWith(expect.stringContaining('Redis에 사용자 ID 저장 완료'));
     });
 
@@ -75,4 +84,52 @@ describe('Redis 유틸리티 함수 테스트', () => {
       expect(console.error).toHaveBeenCalledWith('Redis에서 사용자 ID 조회 실패:', mockError);
     });
   });
-}); 
+
+  describe('deleteUserIdFromCache 함수', () => {
+    it('Redis에서 사용자 ID를 삭제해야 함', async () => {
+      mockRedis.del.mockResolvedValueOnce(1);
+
+      await deleteUserIdFromCache('testuser');
+
+      expect(mockRedis.del).toHaveBeenCalledWith('userId:testuser');
+    });
+
+    it('예외 발생 시 오류를 기록해야 함', async () => {
+      const mockError = new Error('Redis 연결 오류');
+      mockRedis.del.mockRejectedValueOnce(mockError);
+
+      await deleteUserIdFromCache('testuser');
+
+      expect(console.error).toHaveBeenCalledWith('Redis에서 사용자 ID 삭제 실패:', mockError);
+    });
+  });
+
+  describe('미존재 사용자 캐시 함수', () => {
+    it('찾지 못한 닉네임을 10분 동안 저장해야 함', async () => {
+      mockRedis.set.mockResolvedValueOnce('OK');
+
+      await saveUserNotFoundToCache('nonexistentuser');
+
+      expect(mockRedis.set).toHaveBeenCalledWith('userNotFound:nonexistentuser', '1', 'EX', 600);
+    });
+
+    it('저장된 닉네임이면 true를 반환해야 함', async () => {
+      mockRedis.get.mockResolvedValueOnce('1');
+
+      expect(await isUserNotFoundCached('nonexistentuser')).toBe(true);
+      expect(mockRedis.get).toHaveBeenCalledWith('userNotFound:nonexistentuser');
+    });
+
+    it('저장되지 않은 닉네임이면 false를 반환해야 함', async () => {
+      mockRedis.get.mockResolvedValueOnce(null);
+
+      expect(await isUserNotFoundCached('weakness')).toBe(false);
+    });
+
+    it('조회 중 예외가 나면 false를 반환해야 함', async () => {
+      mockRedis.get.mockRejectedValueOnce(new Error('Redis 연결 오류'));
+
+      expect(await isUserNotFoundCached('weakness')).toBe(false);
+    });
+  });
+});

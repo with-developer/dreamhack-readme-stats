@@ -87,6 +87,12 @@
     line-height: 1.5;
 }
 
+.codeHint {
+    margin: 0.5rem 0 0 0;
+    font-size: 0.8rem;
+    color: #666;
+}
+
 .example {
     margin: 0 0 2rem 0;
     text-align: center;
