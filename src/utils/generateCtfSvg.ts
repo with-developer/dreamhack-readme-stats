@@ -69,10 +69,12 @@ ${body}
   `;
 }
 
-// 진행 중인 시즌은 ONGOING, 끝난 시즌은 FINAL
-function statusPill(colors: ThemeColors, live: boolean): string {
-  const label = live ? 'ONGOING' : 'FINAL';
-  const color = live ? colors.accent : colors.title;
+export type TCtfSeasonStatus = 'live' | 'final' | 'upcoming';
+
+// 진행 중인 시즌은 ONGOING, 끝난 시즌은 FINAL, 아직 시작하지 않은 시즌은 UPCOMING
+function statusPill(colors: ThemeColors, status: TCtfSeasonStatus): string {
+  const label = status === 'live' ? 'ONGOING' : status === 'final' ? 'FINAL' : 'UPCOMING';
+  const color = status === 'live' ? colors.accent : status === 'final' ? colors.title : colors.subText;
   const width = label.length * 5.8 + 18;
   const x = 370 - width;
   return `<rect x="${x.toFixed(1)}" y="17" width="${width.toFixed(1)}" height="18" rx="9" fill="${color}" fill-opacity="0.14"/>
@@ -132,7 +134,7 @@ export function generateCtfSeasonSvg(nickname: string, result: TCtfSeasonResult,
 
   const body = `
   <text x="20" y="30" class="title">Dreamhack CTF Season ${escapeXml(result.season)}</text>
-  ${statusPill(colors, live)}
+  ${statusPill(colors, live ? 'live' : 'final')}
   <text x="20" y="72" class="name">${escapeXml(name)}</text>
   <text x="370" y="52" class="top-label" text-anchor="end">TIER</text>
   <text x="370" y="74" class="tier" text-anchor="end" fill="${color}">${escapeXml(tierText)}</text>
@@ -141,17 +143,30 @@ export function generateCtfSeasonSvg(nickname: string, result: TCtfSeasonResult,
   <text x="370" y="93" class="note" text-anchor="end">${right}</text>
   <rect x="${barX}" y="99" width="${barWidth}" height="7" rx="3.5" fill="${colors.track}"/>
   ${ratio > 0 ? `<rect x="${barX}" y="99" width="${(barWidth * ratio).toFixed(1)}" height="7" rx="3.5" fill="${color}"/>` : ''}
-  ${separators.map((x) => `<rect x="${(x - 1).toFixed(1)}" y="99" width="2" height="7" fill="${colors.background === 'none' ? colors.title : colors.background}" fill-opacity="${colors.background === 'none' ? 0.5 : 1}"/>`).join('')}
+  ${separators.map((x) => `<rect x="${(x - 1).toFixed(1)}" y="99" width="2" height="7" fill="${colors.knockout}"/>`).join('')}
 
 ${statBox(15, 'Season Rank', rankValue, colors)}
 ${statBox(137, 'TOP', `<tspan class="accent">${topPercentage(result)}</tspan>`, colors)}
-${statBox(259, 'Contests', `<tspan class="value">${escapeXml(result.contests)}</tspan>`, colors)}`;
+${statBox(259, 'Contests', `<tspan class="value">${result.contests === null ? '-' : escapeXml(result.contests)}</tspan>`, colors)}`;
 
   return frame(390, 190, colors, `.tier { font: 700 18px ${F}; }`, body);
 }
 
+// 레이팅 → 세로 위치. 가장 높은 점 위로 topPad 픽셀을 비워 끝 숫자·티어 알약이 머리글과 겹치지 않게 하고,
+// 그 여백 끝(y0)에 해당하는 레이팅(high)도 돌려줌 (티어 구간 배경을 거기까지 칠하기 위함)
+function ratingScale(ratings: number[], y0: number, y1: number, topPad: number) {
+  const low = Math.floor(Math.min(...ratings) / 100) * 100 - 100;
+  const max = Math.max(...ratings);
+  const ratingPerPx = (max - low) / (y1 - y0 - topPad);
+  return {
+    low,
+    high: max + topPad * ratingPerPx,
+    toY: (rating: number) => y1 - (rating - low) / ratingPerPx,
+  };
+}
+
 function tierBands(theme: Theme, low: number, high: number, toY: (rating: number) => number): string {
-  const opacity = themes[theme].background === '#ffffff' || theme === 'transparent' ? 0.1 : 0.14;
+  const opacity = themes[theme].scheme === 'light' ? 0.1 : 0.14;
   return CTF_TIER_GROUPS.filter((group) => group.to > low && group.from < high)
     .map((group) => {
       const top = toY(Math.min(group.to, high));
@@ -191,12 +206,10 @@ export function generateCtfGraphSvg(nickname: string, result: TCtfSeasonResult, 
   }
   const colors = themes[theme];
 
-  const ratings = points.map((point) => point.rating);
-  const low = Math.floor(Math.min(...ratings) / 100) * 100 - 100;
-  const high = Math.ceil(Math.max(...ratings) / 100) * 100 + 100;
   const x0 = 80, x1 = 350, y0 = 82, y1 = 176;
+  // 끝 숫자(점 위 9px)와 등수 표시가 들어갈 18px
+  const { low, high, toY } = ratingScale(points.map((point) => point.rating), y0, y1, 18);
   const toX = (i: number) => (points.length === 1 ? (x0 + x1) / 2 : x0 + ((x1 - x0) * i) / (points.length - 1));
-  const toY = (rating: number) => y1 - ((rating - low) / (high - low)) * (y1 - y0);
 
   const solidCount = adjusted ? points.length - 1 : points.length;
   const line = points.slice(0, solidCount).map((p, i) => `${toX(i).toFixed(1)},${toY(p.rating).toFixed(1)}`).join(' ');
@@ -206,7 +219,7 @@ export function generateCtfGraphSvg(nickname: string, result: TCtfSeasonResult, 
     const x = toX(i).toFixed(1);
     const y = toY(point.rating);
     const podium = point.rank !== null && point.rank >= 1 && point.rank <= 3;
-    return `<circle cx="${x}" cy="${y.toFixed(1)}" r="${podium ? 3.5 : 2.5}" fill="${podium ? colors.accent : colors.background === 'none' ? colors.accent : colors.background}" stroke="${colors.accent}" stroke-width="1.5"/>${
+    return `<circle cx="${x}" cy="${y.toFixed(1)}" r="${podium ? 3.5 : 2.5}" fill="${podium ? colors.accent : colors.knockout}" stroke="${colors.accent}" stroke-width="1.5"/>${
       podium ? `<text x="${x}" y="${(y - 7).toFixed(1)}" class="podium" fill="${colors.title}" text-anchor="middle">#${point.rank}</text>` : ''}`;
   }).join('');
   const lastX = toX(last), lastY = toY(result.rating);
@@ -217,10 +230,10 @@ export function generateCtfGraphSvg(nickname: string, result: TCtfSeasonResult, 
 
   const body = `
   <text x="20" y="30" class="title">Dreamhack CTF Season ${escapeXml(result.season)}</text>
-  ${statusPill(colors, live)}
+  ${statusPill(colors, live ? 'live' : 'final')}
   <text x="20" y="64" class="name-small">${escapeXml(name)}</text>
   ${right.svg}
-  <text x="370" y="78" class="label" text-anchor="end">${escapeXml(rankText)} · ${escapeXml(result.contests)} contests</text>
+  <text x="370" y="78" class="label" text-anchor="end">${escapeXml(rankText)} · ${result.contests === null ? '-' : escapeXml(result.contests)} contests</text>
   <g>
   ${tierBands(theme, low, high, toY)}
   </g>
@@ -228,7 +241,7 @@ export function generateCtfGraphSvg(nickname: string, result: TCtfSeasonResult, 
   <polyline points="${line}" fill="none" stroke="${colors.accent}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
   ${adjusted ? `<line x1="${toX(last - 1).toFixed(1)}" y1="${toY(points[last - 1].rating).toFixed(1)}" x2="${lastX.toFixed(1)}" y2="${lastY.toFixed(1)}" stroke="${colors.accent}" stroke-width="2" stroke-dasharray="3 3"/>` : ''}
   ${dots}
-  <circle cx="${lastX.toFixed(1)}" cy="${lastY.toFixed(1)}" r="4" fill="${tierColor(theme, result.tierClass)}" stroke="${colors.background === 'none' ? colors.title : colors.background}" stroke-width="1.5"/>
+  <circle cx="${lastX.toFixed(1)}" cy="${lastY.toFixed(1)}" r="4" fill="${tierColor(theme, result.tierClass)}" stroke="${colors.knockout}" stroke-width="1.5"/>
   <text x="${(lastX + 5).toFixed(1)}" y="${(lastY - 9).toFixed(1)}" class="end" fill="${colors.text}" text-anchor="end">${escapeXml(result.rating)}</text>`;
 
   return frame(390, 190, colors, GRAPH_CSS + `\n    .rating-small { font: 700 15px ${F}; fill: ${colors.text}; }`, body);
@@ -244,12 +257,10 @@ export function generateCtfHistorySvg(
 ): string {
   const colors = themes[theme];
   const points = seasons.slice(-CTF_HISTORY_MAX_SEASONS);
-  const ratings = points.map((point) => point.rating);
-  const low = Math.floor(Math.min(...ratings) / 100) * 100 - 100;
-  const high = Math.ceil(Math.max(...ratings) / 100) * 100 + 150;
   const x0 = 92, x1 = 340, y0 = 74, y1 = 166;
+  // 점 위 티어 알약(23px 위까지)이 들어갈 24px
+  const { low, high, toY } = ratingScale(points.map((point) => point.rating), y0, y1, 24);
   const toX = (i: number) => (points.length === 1 ? (x0 + x1) / 2 : x0 + ((x1 - x0) * i) / (points.length - 1));
-  const toY = (rating: number) => y1 - ((rating - low) / (high - low)) * (y1 - y0);
 
   const liveIndex = points.findIndex((point) => point.live);
   const finished = liveIndex === -1 ? points : points.slice(0, liveIndex);
@@ -264,7 +275,7 @@ export function generateCtfHistorySvg(
     const color = tierColor(theme, point.tierClass);
     const short = ctfTierShort(point.tier || ctfTierGroup(point.rating).name);
     const pillWidth = short.length * 6 + 10;
-    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="${point.live ? (colors.background === 'none' ? colors.title : colors.background) : color}" stroke="${color}" stroke-width="2"/>
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="${point.live ? colors.knockout : color}" stroke="${color}" stroke-width="2"/>
   <rect x="${(x - pillWidth / 2).toFixed(1)}" y="${(y - 23).toFixed(1)}" width="${pillWidth}" height="14" rx="7" fill="${color}"/>
   <text x="${x.toFixed(1)}" y="${(y - 13).toFixed(1)}" class="tier-pill" text-anchor="middle">${escapeXml(short)}</text>
   <text x="${x.toFixed(1)}" y="182" class="season" fill="${colors.subText}" text-anchor="middle">Season ${escapeXml(point.season)}${point.live ? '*' : ''}</text>`;
@@ -289,27 +300,28 @@ export function generateCtfHistorySvg(
   return frame(390, 190, colors, GRAPH_CSS + `\n    .rating-small { font: 700 15px ${F}; fill: ${colors.text}; }`, body);
 }
 
-// 기록이 없을 때: season이 null이면 CTF에 참가한 적 없음, 아니면 그 시즌에 결과 없음
+// 기록이 없을 때: season이 null이면 CTF에 참가한 적 없음, 아니면 그 시즌에 결과 없음(또는 아직 시작 전)
 export function generateCtfEmptySvg(
   nickname: string,
   season: number | null,
-  live: boolean,
+  status: TCtfSeasonStatus,
   lastPlayed: TCtfSeasonSummary | null,
   theme: Theme = 'light'
 ): string {
   const colors = themes[theme];
-  const message = season === null
-    ? 'No CTF record yet'
-    : live
-      ? `No Season ${season} contests yet`
-      : `No Season ${season} record`;
+  const messages: Record<TCtfSeasonStatus, string> = {
+    live: `No Season ${season} contests yet`,
+    final: `No Season ${season} record`,
+    upcoming: `Season ${season} has not started yet`,
+  };
+  const message = season === null ? 'No CTF record yet' : messages[status];
   const detail = lastPlayed
     ? `Last played: Season ${escapeXml(lastPlayed.season)}  <tspan fill="${tierColor(theme, lastPlayed.tierClass)}" font-weight="700">${escapeXml(lastPlayed.tier || ctfTierGroup(lastPlayed.rating).name)}</tspan> ${escapeXml(lastPlayed.rating)}`
     : 'Join a Dreamhack CTF to get a tier.';
 
   const body = `
   <text x="20" y="30" class="title">${season === null ? 'Dreamhack CTF' : `Dreamhack CTF Season ${escapeXml(season)}`}</text>
-  ${season === null ? '' : statusPill(colors, live)}
+  ${season === null ? '' : statusPill(colors, status)}
   <text x="20" y="72" class="name">${escapeXml(fitNickname(nickname, 350, 15.6))}</text>
   <rect x="15" y="92" width="360" height="84" rx="8" fill="${colors.cardBackground}"/>
   <text x="195" y="126" class="message" text-anchor="middle">${escapeXml(message)}</text>

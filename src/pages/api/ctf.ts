@@ -41,9 +41,14 @@ function isLive(seasons: TCtfSeason[], season: number, current: number | null, n
   return season === current && !!info && now.getTime() <= new Date(info.endsAt).getTime();
 }
 
+function hasNotStarted(seasons: TCtfSeason[], season: number, now: Date): boolean {
+  const info = seasons.find((item) => item.number === season);
+  return !!info && now.getTime() < new Date(info.startsAt).getTime();
+}
+
 // 시즌별 결과 목록만 있고 시즌 상세 조회가 비어 있을 때 쓰는 값 (순위·대회 수는 모름)
 function summaryToResult(summary: TCtfSeasonSummary): TCtfSeasonResult {
-  return { ...summary, rank: 0, participants: 0, contests: 0, rounds: [] };
+  return { ...summary, rank: 0, participants: 0, contests: null, rounds: [] };
 }
 
 // CTF 시즌 카드 (/api/ctf?username=), view=graph면 대회별 레이팅 그래프, view=seasons면 시즌별 결과
@@ -62,13 +67,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const userId = await getUserId(username);
+    // 시즌 목록은 사용자와 상관없으므로 닉네임 조회와 동시에 가져옴
+    const [userId, seasons] = await Promise.all([getUserId(username), getCtfSeasons()]);
     if (!userId) {
       return sendSvg(res, generateErrorSvg(errorCards.userNotFound(CTF_CARD_TITLE, username), theme));
     }
 
     const now = new Date();
-    const seasons = await getCtfSeasons();
     const current = getCurrentCtfSeason(seasons, now);
 
     if (view === 'seasons') {
@@ -76,7 +81,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         getCtfSeasonHistory(userId),
         current ? getCtfSeasonResult(userId, current) : Promise.resolve(null),
       ]);
-      const points: (TCtfSeasonSummary & { live?: boolean })[] = history.filter((item) => item.season !== current);
+      // 이번 시즌 상세 결과가 있으면 목록의 같은 시즌 대신 그 값을 씀
+      const points: (TCtfSeasonSummary & { live?: boolean })[] = currentResult
+        ? history.filter((item) => item.season !== currentResult.season)
+        : history;
       if (currentResult) {
         points.push({
           season: currentResult.season,
@@ -87,7 +95,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
       }
       if (points.length === 0) {
-        return sendSvg(res, generateCtfEmptySvg(username, null, false, null, theme));
+        return sendSvg(res, generateCtfEmptySvg(username, null, 'final', null, theme));
       }
       return sendSvg(res, generateCtfHistorySvg(username, points, theme));
     }
@@ -99,6 +107,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return sendSvg(res, generateErrorSvg(errorCards.seasonNotFound(CTF_CARD_TITLE, season.season, latest), theme));
       }
       target = season.season;
+      if (hasNotStarted(seasons, target, now)) {
+        const history = await getCtfSeasonHistory(userId);
+        return sendSvg(res, generateCtfEmptySvg(username, target, 'upcoming', history[history.length - 1] ?? null, theme));
+      }
     } else {
       target = current;
     }
@@ -107,16 +119,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (!result) {
       const history = await getCtfSeasonHistory(userId);
+      const targetSummary = history.find((item) => item.season === target);
       const lastPlayed = history.filter((item) => item.season !== target).pop() ?? null;
 
-      // 기본 카드는 이번 시즌에 참가하지 않았으면 결과가 있는 가장 최근 시즌을 보여줌 (Dreamhack 프로필과 같은 기준)
-      if (season.kind === 'default' && lastPlayed) {
+      if (targetSummary) {
+        // 시즌 상세가 비어 있어도 시즌별 결과 목록에 그 시즌이 있으면 그 값으로 보여줌
+        result = summaryToResult(targetSummary);
+      } else if (season.kind === 'default' && lastPlayed) {
+        // 기본 카드는 이번 시즌에 참가하지 않았으면 결과가 있는 가장 최근 시즌을 보여줌 (Dreamhack 프로필과 같은 기준)
         target = lastPlayed.season;
         result = (await getCtfSeasonResult(userId, target)) ?? summaryToResult(lastPlayed);
       } else {
         const showSeason = season.kind === 'default' ? null : target;
-        const live = showSeason !== null && isLive(seasons, showSeason, current, now);
-        return sendSvg(res, generateCtfEmptySvg(username, showSeason, live, lastPlayed, theme));
+        const status = showSeason !== null && isLive(seasons, showSeason, current, now) ? 'live' : 'final';
+        return sendSvg(res, generateCtfEmptySvg(username, showSeason, status, lastPlayed, theme));
       }
     }
 

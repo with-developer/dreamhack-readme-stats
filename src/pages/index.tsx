@@ -85,8 +85,9 @@ export default function Home() {
   const [confirmedUsername, setConfirmedUsername] = useState('');
   const [selectedTheme, setSelectedTheme] = useState<ThemeChoice>('light');
   const [selectedCard, setSelectedCard] = useState<CardType>('stats');
-  // CTF 시즌 카드의 시즌 (비우면 마지막으로 참가한 시즌)
+  // CTF 시즌 카드의 시즌 (비우면 마지막으로 참가한 시즌). 닉네임처럼 미리보기를 누를 때 확정해서, 입력할 때마다 카드를 다시 요청하지 않음
   const [season, setSeason] = useState('');
+  const [confirmedSeason, setConfirmedSeason] = useState('');
   const seasonEnabled = !!CARDS[selectedCard].season;
   const seasonInvalid = seasonEnabled && season.trim() !== '' && normalizeSeason(season) === null;
   const [previewKey, setPreviewKey] = useState(0);
@@ -116,11 +117,11 @@ export default function Home() {
 
   const baseUrl = 'https://dreamhack-readme-stats.vercel.app';
 
-  const codeOptions = { card: selectedCard, theme: selectedTheme, username: confirmedUsername, season };
+  const codeOptions = { card: selectedCard, theme: selectedTheme, username: confirmedUsername, season: confirmedSeason };
 
   // 미리보기는 상대 주소 (auto면 light/dark 두 주소를 <picture>로 묶음)
   const getPreviewUrl = (theme: Theme) =>
-    buildCardUrl('', { card: selectedCard, theme, username: confirmedUsername, season });
+    buildCardUrl('', { card: selectedCard, theme, username: confirmedUsername, season: confirmedSeason });
 
   const getMarkdownCode = () => buildMarkdownCode(baseUrl, codeOptions);
 
@@ -140,6 +141,7 @@ export default function Home() {
       return;
     }
     setConfirmedUsername(username.trim());
+    setConfirmedSeason(season);
     setIsLoading(true);
     setPreviewKey(prev => prev + 1);
   };

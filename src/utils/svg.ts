@@ -11,6 +11,8 @@ export const themes: Record<Theme, ThemeColors> = {
     subText: '#94a3b8',
     accent: '#3b82f6',
     track: '#e2e8f0',
+    knockout: '#ffffff',
+    scheme: 'light',
   },
   dark: {
     background: '#0d1117',
@@ -21,6 +23,8 @@ export const themes: Record<Theme, ThemeColors> = {
     subText: '#7d8590',
     accent: '#58a6ff',
     track: '#30363d',
+    knockout: '#0d1117',
+    scheme: 'dark',
   },
   dracula: {
     background: '#282a36',
@@ -31,6 +35,8 @@ export const themes: Record<Theme, ThemeColors> = {
     subText: '#6272a4',
     accent: '#ff79c6',
     track: '#44475a',
+    knockout: '#282a36',
+    scheme: 'dark',
   },
   tokyonight: {
     background: '#1a1b26',
@@ -41,6 +47,8 @@ export const themes: Record<Theme, ThemeColors> = {
     subText: '#565f89',
     accent: '#bb9af7',
     track: '#2f3549',
+    knockout: '#1a1b26',
+    scheme: 'dark',
   },
   nord: {
     background: '#2e3440',
@@ -51,6 +59,8 @@ export const themes: Record<Theme, ThemeColors> = {
     subText: '#7b88a1',
     accent: '#88c0d0',
     track: '#434c5e',
+    knockout: '#2e3440',
+    scheme: 'dark',
   },
   gruvbox: {
     background: '#282828',
@@ -61,6 +71,8 @@ export const themes: Record<Theme, ThemeColors> = {
     subText: '#a89984',
     accent: '#fe8019',
     track: '#504945',
+    knockout: '#282828',
+    scheme: 'dark',
   },
   // README 배경(라이트/다크) 어디에 놓여도 읽히도록 글자는 중간 회색, 배경과 테두리는 없음
   transparent: {
@@ -72,6 +84,8 @@ export const themes: Record<Theme, ThemeColors> = {
     subText: '#8b949e',
     accent: '#3b82f6',
     track: '#8b949e33',
+    knockout: '#8b949e80',
+    scheme: 'light',
   },
 };
 

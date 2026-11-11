@@ -105,7 +105,7 @@ describe('ctf API 엔드포인트 테스트', () => {
     await call({ username: 'player' });
     expect(ctfSvg.generateCtfSeasonSvg).toHaveBeenCalledWith(
       'player',
-      { season: 7, tier: 'Gold II', tierClass: 'gold', rating: 1600, rank: 0, participants: 0, contests: 0, rounds: [] },
+      { season: 7, tier: 'Gold II', tierClass: 'gold', rating: 1600, rank: 0, participants: 0, contests: null, rounds: [] },
       false,
       'light'
     );
@@ -116,7 +116,7 @@ describe('ctf API 엔드포인트 테스트', () => {
     (dreamhackUtils.getCtfSeasonHistory as jest.Mock).mockResolvedValueOnce([]);
     const res = await call({ username: 'player' });
     expect(res._getData()).toBe('<svg>empty</svg>');
-    expect(ctfSvg.generateCtfEmptySvg).toHaveBeenCalledWith('player', null, false, null, 'light');
+    expect(ctfSvg.generateCtfEmptySvg).toHaveBeenCalledWith('player', null, 'final', null, 'light');
   });
 
   it('season=7이면 그 시즌을, season=current면 이번 시즌을 보여줘야 함', async () => {
@@ -131,10 +131,32 @@ describe('ctf API 엔드포인트 테스트', () => {
   it('고른 시즌에 결과가 없으면 그 시즌의 기록 없음 카드와 마지막 참가 시즌을 보여줘야 함', async () => {
     mockResults({});
     await call({ username: 'player', season: 'current' });
-    expect(ctfSvg.generateCtfEmptySvg).toHaveBeenLastCalledWith('player', 8, true, history[1], 'light');
+    expect(ctfSvg.generateCtfEmptySvg).toHaveBeenLastCalledWith('player', 8, 'live', history[1], 'light');
 
     await call({ username: 'player', season: '6' });
-    expect(ctfSvg.generateCtfEmptySvg).toHaveBeenLastCalledWith('player', 6, false, history[1], 'light');
+    expect(ctfSvg.generateCtfEmptySvg).toHaveBeenLastCalledWith('player', 6, 'final', history[1], 'light');
+  });
+
+  it('고른 시즌의 상세가 비어 있어도 시즌별 결과 목록에 있으면 그 값으로 보여줘야 함 (기본 카드와 같은 동작)', async () => {
+    mockResults({});
+    await call({ username: 'player', season: '7' });
+    expect(ctfSvg.generateCtfEmptySvg).not.toHaveBeenCalled();
+    expect(ctfSvg.generateCtfSeasonSvg).toHaveBeenCalledWith(
+      'player',
+      { season: 7, tier: 'Gold II', tierClass: 'gold', rating: 1600, rank: 0, participants: 0, contests: null, rounds: [] },
+      false,
+      'light'
+    );
+  });
+
+  it('아직 시작하지 않은 시즌을 고르면 시작 전 안내를 보여줘야 함', async () => {
+    (dreamhackUtils.getCtfSeasons as jest.Mock).mockResolvedValue([
+      ...seasons,
+      { number: 9, startsAt: '2027-01-01T00:00:00+09:00', endsAt: '2027-12-31T00:00:00+09:00' },
+    ]);
+    await call({ username: 'player', season: '9' });
+    expect(dreamhackUtils.getCtfSeasonResult).not.toHaveBeenCalled();
+    expect(ctfSvg.generateCtfEmptySvg).toHaveBeenCalledWith('player', 9, 'upcoming', history[1], 'light');
   });
 
   it('없는 시즌 번호나 잘못된 값이면 안내 카드를 보여줘야 함', async () => {
@@ -165,6 +187,14 @@ describe('ctf API 엔드포인트 테스트', () => {
     );
   });
 
+  it('view=seasons에서 이번 시즌 상세가 없으면 결과 목록에 있는 같은 시즌을 빼지 않아야 함', async () => {
+    mockResults({});
+    (dreamhackUtils.getCtfSeasonHistory as jest.Mock).mockResolvedValueOnce([...history, { season: 8, tier: 'Gold I', tierClass: 'gold', rating: 1700 }]);
+    await call({ username: 'player', view: 'seasons' });
+    const [, points] = (ctfSvg.generateCtfHistorySvg as jest.Mock).mock.calls[0];
+    expect(points.map((p: { season: number }) => p.season)).toEqual([5, 7, 8]);
+  });
+
   it('view=seasons인데 기록이 하나도 없으면 기록 없음 카드를 보여줘야 함', async () => {
     mockResults({});
     (dreamhackUtils.getCtfSeasonHistory as jest.Mock).mockResolvedValueOnce([]);
@@ -179,7 +209,7 @@ describe('ctf API 엔드포인트 테스트', () => {
     (dreamhackUtils.getUserId as jest.Mock).mockResolvedValueOnce(null);
     res = await call({ username: 'nobody' });
     expect(res._getData()).toContain('User not found');
-    expect(dreamhackUtils.getCtfSeasons).not.toHaveBeenCalled();
+    expect(dreamhackUtils.getCtfSeasonResult).not.toHaveBeenCalled();
   });
 
   it('Dreamhack 조회가 실패하면 오류 카드를 200으로 보여줘야 함', async () => {

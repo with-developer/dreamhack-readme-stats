@@ -198,3 +198,20 @@ describe('generateCategorySvg 원형 차트 가운데 구멍 테스트', () => {
     }
   });
 });
+
+describe('generateCategorySvg 조각 경계선 테스트', () => {
+  it('배경이 없는 transparent 테마에서도 조각 사이 경계선을 그려야 함', () => {
+    const result = generateCategorySvg({
+      nickname: 'weakness',
+      total_score: 300,
+      categories: [
+        { name: 'web', score: 200, rank: 1, color: '#ff6b6b' },
+        { name: 'crypto', score: 100, rank: 2, color: '#fcc419' },
+      ],
+    }, 'transparent');
+    const doc = new DOMParser().parseFromString(result.trim(), 'image/svg+xml');
+    const strokes = Array.from(doc.querySelectorAll('g[mask="url(#pie-hole)"] path')).map((el) => el.getAttribute('stroke'));
+    expect(strokes).toHaveLength(2);
+    expect(strokes.every((stroke) => stroke && stroke !== 'none')).toBe(true);
+  });
+});

@@ -1,4 +1,5 @@
 import { Theme } from '../types';
+import { themes } from './svg';
 
 // Dreamhack 티어 계열 (문제 난이도와 CTF 티어가 같은 이름을 씀)
 export type TTierClass =
@@ -37,9 +38,9 @@ const DARK: Record<TTierClass, string> = {
   grandmaster: '#f06595',
 };
 
-// transparent 테마는 README가 라이트일 수도 다크일 수도 있어 양쪽에서 읽히는 진한 색을 씀
+// 테마의 scheme을 따름 (transparent는 README가 라이트일 수도 다크일 수도 있어 양쪽에서 읽히는 진한 쪽인 light)
 export function tierColors(theme: Theme): Record<TTierClass, string> {
-  return theme === 'light' || theme === 'transparent' ? LIGHT : DARK;
+  return themes[theme].scheme === 'light' ? LIGHT : DARK;
 }
 
 export function tierColor(theme: Theme, tierClass: string): string {

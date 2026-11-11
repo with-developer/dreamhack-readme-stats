@@ -301,7 +301,7 @@ export async function getCtfSeasonResult(userId: number, season: number): Promis
     rating: result.rating,
     rank: result.rank ?? 0,
     participants: result.season_participants ?? 0,
-    contests: data.cnt_participated ?? 0,
+    contests: data.cnt_participated ?? null,
     rounds: (data.graph_data ?? [])
       .filter((round) => typeof round.rating === 'number')
       .map((round) => ({ round: round.round ?? 0, rating: round.rating as number, rank: round.rank ?? null })),

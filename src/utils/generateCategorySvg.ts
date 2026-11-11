@@ -48,7 +48,7 @@ export function generateCategorySvg(stats: TCategoryStats, theme: Theme = 'light
         // 100%인 경우 arc 대신 원을 그림 (SVG arc는 시작점==끝점이면 렌더링 안됨)
         path = `
           <circle cx="${pieCenterX}" cy="${pieCenterY}" r="${radius}" fill="${category.color}"
-            stroke="${colors.background}" stroke-width="1" />
+            stroke="${colors.knockout}" stroke-width="1" />
         `;
       } else {
         // 원형 조각 경로
@@ -62,7 +62,7 @@ export function generateCategorySvg(stats: TCategoryStats, theme: Theme = 'light
           <path
             d="M ${pieCenterX} ${pieCenterY} L ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY} Z"
             fill="${category.color}"
-            stroke="${colors.background}"
+            stroke="${colors.knockout}"
             stroke-width="1"
           />
         `;

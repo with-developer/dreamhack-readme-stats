@@ -92,10 +92,16 @@ describe('generateCtfSeasonSvg 함수 테스트', () => {
     expect(svg).toContain('Season final');
   });
 
-  it('순위·참가자 수가 없으면 -로 표시해야 함', () => {
-    const svg = generateCtfSeasonSvg('player', { ...finished, rank: 0, participants: 0 }, false);
-    expect(parse(svg).querySelectorAll('.value')[0].textContent).toBe('-');
+  it('순위·참가자 수·대회 수를 모르면 -로 표시해야 함 (0으로 보이면 안 됨)', () => {
+    const svg = generateCtfSeasonSvg('player', { ...finished, rank: 0, participants: 0, contests: null }, false);
+    const values = Array.from(parse(svg).querySelectorAll('.value')).map((el) => el.textContent);
+    expect(values).toEqual(['-', '-']);
     expect(parse(svg).querySelector('.accent')?.textContent).toBe('-');
+  });
+
+  it('Dreamhack이 참가 0회라고 준 시즌은 0으로 표시해야 함', () => {
+    const svg = generateCtfSeasonSvg('player', { ...finished, contests: 0, rounds: [] }, false);
+    expect(Array.from(parse(svg).querySelectorAll('.value')).map((el) => el.textContent)[1]).toBe('0');
   });
 
   it('티어 막대를 III·II·I 세 칸으로 나누고 구간 안 위치만큼 채워야 함', () => {
@@ -137,6 +143,16 @@ describe('generateCtfGraphSvg 함수 테스트', () => {
     expect(svg).not.toContain('<polyline');
   });
 
+  it('레이팅 폭이 넓어도 끝 숫자가 그래프 위쪽 머리글(y 82 위)로 올라가지 않아야 함', () => {
+    const wide = { ...finished, rating: 2450, rounds: [{ round: 1, rating: 1000, rank: 50 }, { round: 2, rating: 2500, rank: 1 }, { round: 3, rating: 2450, rank: 9 }] };
+    const doc = parse(generateCtfGraphSvg('player', wide, false));
+    const endY = Number(doc.querySelector('.end')?.getAttribute('y'));
+    // 10px 글자의 윗부분(기준선 - 8)이 그래프 영역 안
+    expect(endY - 8).toBeGreaterThanOrEqual(82);
+    const podiumY = Number(doc.querySelector('.podium')?.getAttribute('y'));
+    expect(podiumY - 8).toBeGreaterThanOrEqual(82);
+  });
+
   it('대회가 하나뿐이면 점 하나짜리 그래프 대신 기본형으로 그려야 함', () => {
     const svg = generateCtfGraphSvg('player', { ...finished, rating: 1588, rounds: [{ round: 1, rating: 1588, rank: 8 }] }, false);
     expect(svg).toContain('Season Rank');
@@ -169,6 +185,15 @@ describe('generateCtfHistorySvg 함수 테스트', () => {
     expect(doc.querySelector('.note')?.textContent).toBe('* ongoing');
   });
 
+  it('시즌 사이 레이팅 차이가 커도 티어 알약이 머리글(y 61까지)을 덮지 않아야 함', () => {
+    const doc = parse(generateCtfHistorySvg('player', [
+      { season: 1, tier: 'Bronze III', tierClass: 'bronze', rating: 950 },
+      { season: 2, tier: 'Grandmaster', tierClass: 'grandmaster', rating: 2950 },
+    ]));
+    const pillTops = Array.from(doc.querySelectorAll('rect[height="14"]')).map((el) => Number(el.getAttribute('y')));
+    expect(Math.min(...pillTops)).toBeGreaterThanOrEqual(74);
+  });
+
   it('최근 6개 시즌만 그려야 함', () => {
     const many = Array.from({ length: 8 }, (_, i) => ({ season: i + 1, tier: 'Gold I', tierClass: 'gold', rating: 1700 }));
     const doc = parse(generateCtfHistorySvg('player', many));
@@ -183,21 +208,28 @@ describe('generateCtfHistorySvg 함수 테스트', () => {
 
 describe('generateCtfEmptySvg 함수 테스트', () => {
   it('CTF 기록이 아예 없으면 참가 안내를 보여줘야 함', () => {
-    const svg = generateCtfEmptySvg('player', null, false, null);
+    const svg = generateCtfEmptySvg('player', null, 'final', null);
     expect(svg).toContain('No CTF record yet');
     expect(svg).toContain('Join a Dreamhack CTF');
     expect(svg).not.toContain('ONGOING');
   });
 
   it('이번 시즌에 참가하지 않았으면 마지막으로 참가한 시즌을 함께 보여줘야 함', () => {
-    const svg = generateCtfEmptySvg('player', 8, true, { season: 7, tier: 'Gold II', tierClass: 'gold', rating: 1600 });
+    const svg = generateCtfEmptySvg('player', 8, 'live', { season: 7, tier: 'Gold II', tierClass: 'gold', rating: 1600 });
     expect(svg).toContain('No Season 8 contests yet');
     expect(svg).toContain('Last played: Season 7');
     expect(svg).toContain('ONGOING');
   });
 
+  it('아직 시작하지 않은 시즌은 UPCOMING과 시작 전 안내를 보여줘야 함', () => {
+    const svg = generateCtfEmptySvg('player', 9, 'upcoming', null);
+    expect(svg).toContain('UPCOMING');
+    expect(svg).toContain('Season 9 has not started yet');
+    expect(svg).not.toContain('FINAL');
+  });
+
   it('지난 시즌에 결과가 없으면 기록 없음으로 표시해야 함', () => {
-    expect(generateCtfEmptySvg('player', 3, false, null)).toContain('No Season 3 record');
+    expect(generateCtfEmptySvg('player', 3, 'final', null)).toContain('No Season 3 record');
   });
 });
 
@@ -207,7 +239,8 @@ describe('CTF 카드 테마 테스트', () => {
       expect(ok(generateCtfSeasonSvg('player', live, true, theme))).toBe(true);
       expect(ok(generateCtfGraphSvg('player', finished, false, theme))).toBe(true);
       expect(ok(generateCtfHistorySvg('player', [{ season: 1, tier: 'Gold I', tierClass: 'gold', rating: 1700 }], theme))).toBe(true);
-      expect(ok(generateCtfEmptySvg('player', 8, true, null, theme))).toBe(true);
+      expect(ok(generateCtfEmptySvg('player', 8, 'live', null, theme))).toBe(true);
+      expect(ok(generateCtfEmptySvg('player', 9, 'upcoming', null, theme))).toBe(true);
     }
   });
 });

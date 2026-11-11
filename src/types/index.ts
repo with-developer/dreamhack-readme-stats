@@ -96,7 +96,8 @@ export interface TCtfSeasonResult {
   rating: number;
   rank: number;
   participants: number;
-  contests: number;
+  // 참가 대회 수 (시즌 상세가 비어 결과 목록 값으로 대신 보여줄 때는 모름 = null)
+  contests: number | null;
   rounds: TCtfRound[];
 }
 
@@ -135,4 +136,8 @@ export interface ThemeColors {
   accent: string;
   // 진행 막대의 빈 부분 (transparent 테마는 테두리가 없어서 border와 따로 둠)
   track: string;
+  // 도형 사이를 떼어 보이게 하는 선·속이 빈 점의 색 (배경이 있는 테마는 배경색)
+  knockout: string;
+  // 밝은 배경용인지 (티어 색 진하기와 구간 배경 농도를 고를 때 사용)
+  scheme: 'light' | 'dark';
 } 
