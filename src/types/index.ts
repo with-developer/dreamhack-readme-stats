@@ -1,3 +1,10 @@
+// 프로필 API의 분야별 워게임 기록
+export interface TCategoryEntry {
+  score: number;
+  rank: number;
+  solved_cnt?: number;
+}
+
 export interface TuserData {
   nickname: string;
   contributions: {
@@ -11,26 +18,11 @@ export interface TuserData {
     rank: number;
     score: number;
     category?: {
-      pwnable?: {
-        score: number;
-        rank: number;
-      };
-      reversing?: {
-        score: number;
-        rank: number;
-      };
-      web?: {
-        score: number;
-        rank: number;
-      };
-      crypto?: {
-        score: number;
-        rank: number;
-      };
-      [key: string]: {
-        score: number;
-        rank: number;
-      } | undefined;
+      pwnable?: TCategoryEntry;
+      reversing?: TCategoryEntry;
+      web?: TCategoryEntry;
+      crypto?: TCategoryEntry;
+      [key: string]: TCategoryEntry | undefined;
     };
   };
   ctf: {
@@ -68,6 +60,7 @@ export interface TCategoryData {
   score: number;
   rank: number;
   color: string;
+  solved_cnt?: number;
 }
 
 export interface TCategoryStats {
