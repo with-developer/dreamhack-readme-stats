@@ -180,16 +180,16 @@ const GRAPH_CSS = `
     .tier-pill { font: 700 8.5px ${F}; fill: #ffffff; }
     .season { font: 500 10px ${F}; }`;
 
-// 시즌 카드 그래프형: 그 시즌 대회별 레이팅 (3등 안에 든 대회는 등수 표시). 대회 기록이 없으면 기본형
+// 시즌 카드 그래프형: 그 시즌 대회별 레이팅 (3등 안에 든 대회는 등수 표시). 이을 점이 둘 미만이면 기본형
 export function generateCtfGraphSvg(nickname: string, result: TCtfSeasonResult, live: boolean, theme: Theme = 'light'): string {
-  if (result.rounds.length === 0) {
+  const points: { rating: number; rank: number | null; adjusted?: boolean }[] = result.rounds.map((round) => ({ ...round }));
+  // 시즌 결과가 마지막 대회 직후 레이팅과 다르면(시즌 마감 보정) 결과 값을 점선으로 이어 붙임
+  const adjusted = points.length > 0 && points[points.length - 1].rating !== result.rating;
+  if (adjusted) points.push({ rating: result.rating, rank: null, adjusted: true });
+  if (points.length < 2) {
     return generateCtfSeasonSvg(nickname, result, live, theme);
   }
   const colors = themes[theme];
-  const points: { rating: number; rank: number | null; adjusted?: boolean }[] = result.rounds.map((round) => ({ ...round }));
-  // 시즌 결과가 마지막 대회 직후 레이팅과 다르면(시즌 마감 보정) 결과 값을 점선으로 이어 붙임
-  const adjusted = points[points.length - 1].rating !== result.rating;
-  if (adjusted) points.push({ rating: result.rating, rank: null, adjusted: true });
 
   const ratings = points.map((point) => point.rating);
   const low = Math.floor(Math.min(...ratings) / 100) * 100 - 100;

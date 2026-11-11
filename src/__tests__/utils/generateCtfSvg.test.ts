@@ -137,8 +137,16 @@ describe('generateCtfGraphSvg 함수 테스트', () => {
     expect(svg).not.toContain('<polyline');
   });
 
-  it('대회가 하나뿐이어도 올바른 SVG를 만들어야 함', () => {
-    expect(ok(generateCtfGraphSvg('player', { ...finished, rating: 1588, rounds: [{ round: 1, rating: 1588, rank: 8 }] }, false))).toBe(true);
+  it('대회가 하나뿐이면 점 하나짜리 그래프 대신 기본형으로 그려야 함', () => {
+    const svg = generateCtfGraphSvg('player', { ...finished, rating: 1588, rounds: [{ round: 1, rating: 1588, rank: 8 }] }, false);
+    expect(svg).toContain('Season Rank');
+    expect(svg).not.toContain('<polyline');
+  });
+
+  it('대회가 하나여도 시즌 마감 보정이 있으면 두 점을 이어 그래프로 그려야 함', () => {
+    const doc = parse(generateCtfGraphSvg('player', { ...finished, rating: 1600, rounds: [{ round: 1, rating: 1583, rank: 8 }] }, false));
+    expect(doc.getElementsByTagName('parsererror')).toHaveLength(0);
+    expect(doc.querySelector('line[stroke-dasharray]')).not.toBeNull();
   });
 });
 
