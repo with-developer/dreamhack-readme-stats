@@ -74,6 +74,40 @@ export interface TCategoryStats {
   categories: TCategoryData[];
 }
 
+// CTF 시즌 (시즌마다 레이팅이 새로 시작함)
+export interface TCtfSeason {
+  number: number;
+  startsAt: string;
+  endsAt: string;
+}
+
+// 한 시즌의 대회 한 번 (대회 직후 레이팅과 그 대회 등수)
+export interface TCtfRound {
+  round: number;
+  rating: number;
+  rank: number | null;
+}
+
+// 한 시즌의 공식 결과 (진행 중인 시즌이면 지금까지의 값)
+export interface TCtfSeasonResult {
+  season: number;
+  tier: string;
+  tierClass: string;
+  rating: number;
+  rank: number;
+  participants: number;
+  contests: number;
+  rounds: TCtfRound[];
+}
+
+// 시즌별 결과 목록의 한 줄 (끝난 시즌만 Dreamhack이 줌)
+export interface TCtfSeasonSummary {
+  season: number;
+  tier: string;
+  tierClass: string;
+  rating: number;
+}
+
 // 풀이 기록 한 건 (카드에 필요한 값만 추림)
 export interface TSolveRecord {
   title: string;
