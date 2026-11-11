@@ -2,9 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 import { encodeUsername } from '../utils/encodeUsername';
-
-type Theme = 'light' | 'dark';
-type CardType = 'stats' | 'most-solved';
+import { Theme } from '../types';
+import {
+  buildCardUrl,
+  buildHtmlCode,
+  buildMarkdownCode,
+  CARDS,
+  CARD_TYPES,
+  CardType,
+  normalizeSeason,
+  THEME_LABELS,
+  ThemeChoice,
+} from '../utils/cardCode';
 
 interface DropdownOption<T> {
   value: T;
@@ -74,8 +83,12 @@ function CustomDropdown<T extends string>({ options, value, onChange, placeholde
 export default function Home() {
   const [username, setUsername] = useState('');
   const [confirmedUsername, setConfirmedUsername] = useState('');
-  const [selectedTheme, setSelectedTheme] = useState<Theme>('light');
+  const [selectedTheme, setSelectedTheme] = useState<ThemeChoice>('light');
   const [selectedCard, setSelectedCard] = useState<CardType>('stats');
+  // CTF 시즌 카드의 시즌 (비우면 마지막으로 참가한 시즌)
+  const [season, setSeason] = useState('');
+  const seasonEnabled = !!CARDS[selectedCard].season;
+  const seasonInvalid = seasonEnabled && season.trim() !== '' && normalizeSeason(season) === null;
   const [previewKey, setPreviewKey] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   // 닉네임별 프로필 주소 (찾지 못하면 null). 늦게 도착한 다른 닉네임의 응답이 현재 결과를 덮어쓰지 않도록 닉네임별로 보관
@@ -94,40 +107,24 @@ export default function Home() {
       .catch(() => {});
   };
 
-  const cardOptions: DropdownOption<CardType>[] = [
-    { value: 'stats', label: 'Wargame Stats' },
-    { value: 'most-solved', label: 'Most Solved Categories' },
-  ];
+  const cardOptions: DropdownOption<CardType>[] = CARD_TYPES.map((value) => ({ value, label: CARDS[value].label }));
 
-  const themeOptions: DropdownOption<Theme>[] = [
-    { value: 'light', label: 'Light' },
-    { value: 'dark', label: 'Dark' },
-  ];
+  const themeOptions: DropdownOption<ThemeChoice>[] = (Object.keys(THEME_LABELS) as ThemeChoice[]).map((value) => ({
+    value,
+    label: THEME_LABELS[value],
+  }));
 
   const baseUrl = 'https://dreamhack-readme-stats.vercel.app';
 
-  const getApiUrl = (card: CardType, theme: Theme, user: string) => {
-    const endpoint = card === 'stats' ? 'stats' : 'most-solved';
-    return `${baseUrl}/api/${endpoint}?username=${user ? encodeUsername(user) : '사용자명'}&theme=${theme}`;
-  };
+  const codeOptions = { card: selectedCard, theme: selectedTheme, username: confirmedUsername, season };
 
-  const getPreviewUrl = (card: CardType, theme: Theme, user: string) => {
-    if (!user) return '';
-    const endpoint = card === 'stats' ? 'stats' : 'most-solved';
-    return `/api/${endpoint}?username=${encodeUsername(user)}&theme=${theme}`;
-  };
+  // 미리보기는 상대 주소 (auto면 light/dark 두 주소를 <picture>로 묶음)
+  const getPreviewUrl = (theme: Theme) =>
+    buildCardUrl('', { card: selectedCard, theme, username: confirmedUsername, season });
 
-  const getMarkdownCode = () => {
-    const altText = selectedCard === 'stats' ? 'Dreamhack Stats' : 'Dreamhack Category Chart';
-    return `![${altText}](${getApiUrl(selectedCard, selectedTheme, confirmedUsername)})`;
-  };
+  const getMarkdownCode = () => buildMarkdownCode(baseUrl, codeOptions);
 
-  const getHtmlCode = () => {
-    const altText = selectedCard === 'stats' ? 'Dreamhack Stats' : 'Dreamhack Category Chart';
-    return `<a href="${profileUrl || 'https://dreamhack.io/users/사용자ID'}" target="_blank" rel="noopener noreferrer">
-  <img src="${getApiUrl(selectedCard, selectedTheme, confirmedUsername)}" alt="${altText}" />
-</a>`;
-  };
+  const getHtmlCode = () => buildHtmlCode(baseUrl, codeOptions, profileUrl);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
@@ -199,6 +196,21 @@ export default function Home() {
               />
             </div>
 
+            {seasonEnabled && (
+              <div className={styles.inputGroup}>
+                <label htmlFor="season">시즌</label>
+                <input
+                  type="text"
+                  id="season"
+                  value={season}
+                  onChange={(e) => setSeason(e.target.value)}
+                  placeholder="비우면 마지막 참가 시즌"
+                  className={styles.textInput}
+                  aria-invalid={seasonInvalid}
+                />
+              </div>
+            )}
+
             <div className={styles.inputGroup}>
               <label>테마</label>
               <CustomDropdown
@@ -223,20 +235,40 @@ export default function Home() {
           <h2>미리보기</h2>
           <div className={styles.previewContainer}>
             {confirmedUsername && previewKey > 0 ? (
-              <img
-                key={previewKey}
-                src={getPreviewUrl(selectedCard, selectedTheme, confirmedUsername)}
-                alt="Preview"
-                onLoad={handleImageLoad}
-                onError={handleImageError}
-                className={styles.previewImage}
-              />
+              selectedTheme === 'auto' ? (
+                // 보는 사람의 시스템 테마(GitHub에서는 GitHub 테마)에 따라 light/dark 카드가 바뀜
+                <picture key={previewKey}>
+                  <source media="(prefers-color-scheme: dark)" srcSet={getPreviewUrl('dark')} />
+                  <img
+                    src={getPreviewUrl('light')}
+                    alt="Preview"
+                    onLoad={handleImageLoad}
+                    onError={handleImageError}
+                    className={styles.previewImage}
+                  />
+                </picture>
+              ) : (
+                <img
+                  key={previewKey}
+                  src={getPreviewUrl(selectedTheme)}
+                  alt="Preview"
+                  onLoad={handleImageLoad}
+                  onError={handleImageError}
+                  className={styles.previewImage}
+                />
+              )
             ) : (
               <div className={styles.previewPlaceholder}>
                 사용자명을 입력하고 미리보기를 클릭하세요
               </div>
             )}
           </div>
+          {seasonInvalid && (
+            <p className={styles.codeHint}>시즌은 숫자(예: 7)나 current로 입력하세요. 지금 값은 무시하고 마지막 참가 시즌을 보여줍니다.</p>
+          )}
+          {selectedTheme === 'auto' && (
+            <p className={styles.codeHint}>Auto는 README를 보는 사람의 GitHub 테마에 따라 Light/Dark 카드를 바꿔 보여줍니다. 미리보기는 지금 컴퓨터의 테마를 따릅니다.</p>
+          )}
         </div>
 
         {/* 코드 생성 */}
