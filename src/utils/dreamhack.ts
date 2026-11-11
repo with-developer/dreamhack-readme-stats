@@ -1,4 +1,4 @@
-import { TgetLastRankResponse, TUserRankingResponse, TuserData, TUserRankingResult } from '../types';
+import { TgetLastRankResponse, TSolveRecord, TUserRankingResponse, TuserData, TUserRankingResult } from '../types';
 import {
   getUserIdFromCache,
   saveUserIdToCache,
@@ -177,6 +177,37 @@ export async function getUserData(userId: number, username?: string): Promise<Tu
     console.timeEnd('⚙️ getUserData 함수 전체');
     return null;
   }
+}
+
+export type TSolveSort = 'recent' | 'hardest';
+
+interface TWargameStatsResponse {
+  results: {
+    solved_at?: string;
+    challenge?: { title?: string; tier?: number; tags?: string[]; cnt_solvers?: number };
+  }[];
+}
+
+// 사용자의 풀이 기록 (최근 순 또는 난이도 높은 순). 조회 실패 시 예외를 던짐
+export async function getUserSolves(userId: number, sort: TSolveSort, limit: number): Promise<TSolveRecord[]> {
+  const params = new URLSearchParams({
+    user_id: String(userId),
+    limit: String(limit),
+    offset: '0',
+    ordering: sort === 'hardest' ? '-challenge__tier' : '-solved_at',
+  });
+  const response = await measureFetch(`https://dreamhack.io/api/v1/wargame/stats/?${params}`, 'getUserSolves');
+  if (!response.ok) {
+    throw new Error(`Failed to fetch solves: ${response.status}`);
+  }
+  const data = await response.json() as TWargameStatsResponse;
+  return (data.results || []).slice(0, limit).map((record) => ({
+    title: record.challenge?.title ?? '',
+    tier: record.challenge?.tier ?? 0,
+    tags: record.challenge?.tags ?? [],
+    solvedAt: record.solved_at ?? '',
+    solvers: record.challenge?.cnt_solvers ?? 0,
+  }));
 }
 
 export function calculateTopPercentage(rank: number | null, totalRanks: number | null): string {

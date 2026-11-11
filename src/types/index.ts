@@ -74,6 +74,15 @@ export interface TCategoryStats {
   categories: TCategoryData[];
 }
 
+// 풀이 기록 한 건 (카드에 필요한 값만 추림)
+export interface TSolveRecord {
+  title: string;
+  tier: number;
+  tags: string[];
+  solvedAt: string;
+  solvers: number;
+}
+
 export type Theme = 'light' | 'dark' | 'dracula' | 'tokyonight' | 'nord' | 'gruvbox' | 'transparent';
 
 export interface TErrorCard {
