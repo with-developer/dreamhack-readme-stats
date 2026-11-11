@@ -1,5 +1,6 @@
 import { generateStatsSvg } from '../../utils/generateStatsSvg';
 import { Tstats } from '../../types';
+import { THEME_NAMES, themes } from '../../utils/svg';
 
 describe('generateStatsSvg 유틸리티 함수 테스트', () => {
   const mockStats: Tstats = {
@@ -80,3 +81,27 @@ describe('generateStatsSvg 유틸리티 함수 테스트', () => {
     expect(result).toContain('url(data:font/woff2;base64,');
   });
 }); 
+describe('generateStatsSvg 테마 테스트', () => {
+  const stats: Tstats = {
+    nickname: 'testuser',
+    wargame_solved: 50,
+    wargame_rank: '200/1000',
+    wargameRankPercentage: '20.00',
+    wargame_score: 5000,
+  };
+
+  it('모든 테마에서 올바른 SVG를 만들고 테마 색을 써야 함', () => {
+    for (const name of THEME_NAMES) {
+      const result = generateStatsSvg(stats, name);
+      const doc = new DOMParser().parseFromString(result.trim(), 'image/svg+xml');
+      expect(doc.getElementsByTagName('parsererror')).toHaveLength(0);
+      expect(result).toContain(`fill: ${themes[name].text}`);
+    }
+  });
+
+  it('transparent 테마는 배경과 테두리를 그리지 않아야 함', () => {
+    const result = generateStatsSvg(stats, 'transparent');
+    expect(result).toContain('<rect width="390" height="190" fill="none"');
+    expect(result).toContain('stroke="none"');
+  });
+});

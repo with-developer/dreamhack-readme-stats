@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { TCategoryData, TCategoryStats, Theme } from '../../types';
 import { generateCategorySvg } from '../../utils/generateCategorySvg';
 import { generateErrorSvg, errorCards } from '../../utils/generateErrorSvg';
-import { sendSvg } from '../../utils/svg';
+import { parseTheme, sendSvg } from '../../utils/svg';
 import { getUserId, getUserData } from '../../utils/dreamhack';
 
 // 처음 조회하는 닉네임은 Dreamhack 검색이 여러 번 필요해 기본 10초를 넘을 수 있음
@@ -41,7 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { username, theme: themeParam } = req.query;
 
   // 테마 파라미터 검증
-  const theme: Theme = themeParam === 'dark' ? 'dark' : 'light';
+  const theme: Theme = parseTheme(themeParam);
 
   if (!username || typeof username !== 'string') {
     return sendSvg(res, generateErrorSvg(errorCards.missingUsername(CARD_TITLE), theme));

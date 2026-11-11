@@ -93,9 +93,9 @@ export function generateCategorySvg(stats: TCategoryStats, theme: Theme = 'light
     });
   }
 
-  // 중앙 총점 표시 (원형 차트 내부에)
+  // 중앙 총점 표시 (원형 차트 가운데는 마스크로 뚫어서, 배경이 없는 transparent 테마에서도 구멍이 보이게 함)
+  const holeRadius = radius * 0.45;
   const centerCircle = `
-    <circle cx="${pieCenterX}" cy="${pieCenterY}" r="${radius * 0.45}" fill="${colors.background}" />
     <text x="${pieCenterX}" y="${pieCenterY - 6}" text-anchor="middle" class="total-score-label">Total</text>
     <text x="${pieCenterX}" y="${pieCenterY + 12}" text-anchor="middle" class="total-score-value">${escapeXml(totalScore)}</text>
   `;
@@ -129,8 +129,14 @@ export function generateCategorySvg(stats: TCategoryStats, theme: Theme = 'light
   </g>
 
   <!-- 원형 차트 -->
-  <g transform="translate(0, 0)">
+  <mask id="pie-hole">
+    <rect width="${width}" height="${height}" fill="white"/>
+    <circle cx="${pieCenterX}" cy="${pieCenterY}" r="${holeRadius}" fill="black"/>
+  </mask>
+  <g mask="url(#pie-hole)">
     ${pieChart}
+  </g>
+  <g>
     ${centerCircle}
   </g>
 

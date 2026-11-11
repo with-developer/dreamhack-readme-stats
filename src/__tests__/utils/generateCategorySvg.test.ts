@@ -176,3 +176,25 @@ describe('generateCategorySvg 유틸리티 함수 테스트', () => {
     expect(result).toContain('url(data:font/woff2;base64,');
   });
 }); 
+describe('generateCategorySvg 원형 차트 가운데 구멍 테스트', () => {
+  const stats: TCategoryStats = {
+    nickname: 'weakness',
+    total_score: 3000,
+    categories: [
+      { name: 'web', score: 2000, rank: 50, color: '#ff6b6b' },
+      { name: 'pwnable', score: 1000, rank: 100, color: '#339af0' },
+    ],
+  };
+
+  it('가운데를 배경색 원으로 덮지 않고 마스크로 뚫어야 함 (transparent 테마에서도 구멍이 보이도록)', () => {
+    for (const theme of ['light', 'transparent'] as const) {
+      const result = generateCategorySvg(stats, theme);
+      const doc = new DOMParser().parseFromString(result.trim(), 'image/svg+xml');
+      expect(doc.getElementsByTagName('parsererror')).toHaveLength(0);
+      expect(doc.querySelector('mask#pie-hole circle')?.getAttribute('fill')).toBe('black');
+      expect(doc.querySelector('g[mask="url(#pie-hole)"] path')).not.toBeNull();
+      expect(result).toContain('Total');
+      expect(result).toContain('3000');
+    }
+  });
+});

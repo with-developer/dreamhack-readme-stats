@@ -76,7 +76,7 @@ export interface TCategoryStats {
   categories: TCategoryData[];
 }
 
-export type Theme = 'light' | 'dark';
+export type Theme = 'light' | 'dark' | 'dracula' | 'tokyonight' | 'nord' | 'gruvbox' | 'transparent';
 
 export interface TErrorCard {
   title: string;
@@ -92,4 +92,6 @@ export interface ThemeColors {
   text: string;
   subText: string;
   accent: string;
+  // 진행 막대의 빈 부분 (transparent 테마는 테두리가 없어서 border와 따로 둠)
+  track: string;
 } 
