@@ -332,9 +332,9 @@ describe('getUserSolves 함수 테스트', () => {
     expect((fetch as jest.Mock).mock.calls[0][0]).toBe(
       'https://dreamhack.io/api/v1/wargame/stats/?user_id=20691&limit=5&offset=0&ordering=-solved_at'
     );
+    // 문제 정보가 빠진 기록({})은 건너뜀
     expect(recent).toEqual([
       { title: 'Chaining', tier: 14, tags: ['reversing'], solvedAt: '2024-08-13T22:50:06.610753+09:00', solvers: 103 },
-      { title: '', tier: 0, tags: [], solvedAt: '', solvers: 0 },
     ]);
 
     await getUserSolves(20691, 'hardest', 5);

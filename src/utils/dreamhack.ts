@@ -210,7 +210,8 @@ export async function getUserSolves(userId: number, sort: TSolveSort, limit: num
     throw new Error(`Failed to fetch solves: ${response.status}`);
   }
   const data = await response.json() as TWargameStatsResponse;
-  return (data.results || []).slice(0, limit).map((record) => ({
+  // 문제 정보가 빠진 기록(삭제된 문제 등)은 빈 줄로 그리지 않도록 건너뜀
+  return (data.results || []).filter((record) => !!record.challenge?.title).slice(0, limit).map((record) => ({
     title: record.challenge?.title ?? '',
     tier: record.challenge?.tier ?? 0,
     tags: record.challenge?.tags ?? [],
@@ -244,7 +245,7 @@ interface TCtfSeasonHighlightResponse {
 }
 
 interface TCtfSeasonHighlightsResponse {
-  graph_data?: { number?: number; rating?: number; tier?: TCtfTierResponse }[];
+  graph_data?: { number?: number; rating?: number; rank?: number; tier?: TCtfTierResponse }[];
 }
 
 // 시즌 목록은 1년에 한 번 바뀌므로 함수 인스턴스 안에서 1시간 동안 재사용
@@ -259,11 +260,21 @@ export async function getCtfSeasons(): Promise<TCtfSeason[]> {
   if (ctfSeasonsCache && Date.now() - ctfSeasonsCache.fetchedAt < CTF_SEASONS_TTL_MS) {
     return ctfSeasonsCache.seasons;
   }
-  const response = await measureFetch('https://dreamhack.io/api/v1/ctf/seasons/', 'getCtfSeasons');
-  if (!response.ok) {
-    throw new Error(`Failed to fetch CTF seasons: ${response.status}`);
+  let data: TCtfSeasonsResponseItem[];
+  try {
+    const response = await measureFetch('https://dreamhack.io/api/v1/ctf/seasons/', 'getCtfSeasons');
+    if (!response.ok) {
+      throw new Error(`Failed to fetch CTF seasons: ${response.status}`);
+    }
+    data = await response.json() as TCtfSeasonsResponseItem[];
+  } catch (error) {
+    // 시즌 목록 조회만 실패하면, 시간이 지났더라도 전에 받아 둔 목록으로 카드를 그림
+    if (ctfSeasonsCache) {
+      console.error('Using stale CTF seasons after fetch failure:', error);
+      return ctfSeasonsCache.seasons;
+    }
+    throw error;
   }
-  const data = await response.json() as TCtfSeasonsResponseItem[];
   const seasons = data
     .filter((season) => Number.isInteger(season.number))
     .map((season) => ({ number: season.number, startsAt: season.starts_at, endsAt: season.ends_at }))
@@ -325,6 +336,7 @@ export async function getCtfSeasonHistory(userId: number): Promise<TCtfSeasonSum
       tier: item.tier?.tier ?? '',
       tierClass: item.tier?.tier_class ?? 'unranked',
       rating: item.rating as number,
+      ...(typeof item.rank === 'number' && item.rank > 0 ? { rank: item.rank } : {}),
     }))
     .sort((a, b) => a.season - b.season);
 }

@@ -107,6 +107,8 @@ export interface TCtfSeasonSummary {
   tier: string;
   tierClass: string;
   rating: number;
+  // 시즌 순위 (목록 API가 주는 값, 없으면 생략)
+  rank?: number;
 }
 
 // 풀이 기록 한 건 (카드에 필요한 값만 추림)

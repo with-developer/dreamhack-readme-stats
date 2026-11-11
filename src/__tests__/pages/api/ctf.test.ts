@@ -149,6 +149,13 @@ describe('ctf API 엔드포인트 테스트', () => {
     );
   });
 
+  it('결과 목록 값으로 대신 보여줄 때 목록에 있는 시즌 순위를 살려야 함', async () => {
+    mockResults({});
+    (dreamhackUtils.getCtfSeasonHistory as jest.Mock).mockResolvedValueOnce([{ ...history[1], rank: 79 }]);
+    await call({ username: 'player', season: '7' });
+    expect((ctfSvg.generateCtfSeasonSvg as jest.Mock).mock.calls[0][1]).toMatchObject({ season: 7, rank: 79, participants: 0, contests: null });
+  });
+
   it('아직 시작하지 않은 시즌을 고르면 시작 전 안내를 보여줘야 함', async () => {
     (dreamhackUtils.getCtfSeasons as jest.Mock).mockResolvedValue([
       ...seasons,

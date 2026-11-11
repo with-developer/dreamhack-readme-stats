@@ -128,9 +128,12 @@ export function generateCtfSeasonSvg(nickname: string, result: TCtfSeasonResult,
   const tierText = result.tier || group.name;
   const tierWidth = textWidth(tierText) * 10.8;
   const name = fitNickname(nickname, 370 - tierWidth - 16 - 20, 15.6);
-  const rankValue = result.rank
-    ? `<tspan class="value">${escapeXml(result.rank)}</tspan><tspan class="total" dx="1">/${escapeXml(result.participants)}</tspan>`
-    : '<tspan class="value">-</tspan>';
+  // 참가자 수를 모르면 순위만 표시
+  const rankValue = !result.rank
+    ? '<tspan class="value">-</tspan>'
+    : result.participants
+      ? `<tspan class="value">${escapeXml(result.rank)}</tspan><tspan class="total" dx="1">/${escapeXml(result.participants)}</tspan>`
+      : `<tspan class="value">${escapeXml(result.rank)}</tspan>`;
 
   const body = `
   <text x="20" y="30" class="title">Dreamhack CTF Season ${escapeXml(result.season)}</text>
@@ -226,7 +229,7 @@ export function generateCtfGraphSvg(nickname: string, result: TCtfSeasonResult, 
   const tierText = result.tier || ctfTierGroup(result.rating).name;
   const right = headerRight(theme, tierText, result.tierClass, result.rating, 64);
   const name = fitNickname(nickname, 370 - right.width - 16 - 20, 13.2);
-  const rankText = result.rank ? `#${result.rank}/${result.participants}` : '-';
+  const rankText = !result.rank ? '-' : result.participants ? `#${result.rank}/${result.participants}` : `#${result.rank}`;
 
   const body = `
   <text x="20" y="30" class="title">Dreamhack CTF Season ${escapeXml(result.season)}</text>

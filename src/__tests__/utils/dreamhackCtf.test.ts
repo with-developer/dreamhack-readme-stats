@@ -48,6 +48,21 @@ describe('CTF 시즌 조회 함수 테스트', () => {
     await expect(getCtfSeasons()).resolves.toHaveLength(4);
   });
 
+  it('캐시 시간이 지난 뒤 시즌 목록 조회가 실패하면 전에 받아 둔 목록을 써야 함', async () => {
+    jest.spyOn(console, 'error').mockImplementation();
+    const now = jest.spyOn(Date, 'now').mockReturnValue(1_000_000);
+    (fetch as jest.Mock).mockResolvedValueOnce(okJson(seasonsResponse));
+    await getCtfSeasons();
+
+    now.mockReturnValue(1_000_000 + 2 * 60 * 60 * 1000);
+    (fetch as jest.Mock).mockResolvedValueOnce({ ok: false, status: 502 });
+    await expect(getCtfSeasons()).resolves.toHaveLength(4);
+    (fetch as jest.Mock).mockRejectedValueOnce(new Error('timeout'));
+    await expect(getCtfSeasons()).resolves.toHaveLength(4);
+    expect(fetch).toHaveBeenCalledTimes(3);
+    now.mockRestore();
+  });
+
   it('지금 진행 중인 시즌을 골라야 함 (겹치면 나중 시즌, 공백이면 마지막으로 시작한 시즌)', async () => {
     (fetch as jest.Mock).mockResolvedValue(okJson(seasonsResponse));
     const seasons = await getCtfSeasons();
@@ -113,8 +128,8 @@ describe('CTF 시즌 조회 함수 테스트', () => {
     const history = await getCtfSeasonHistory(20691);
     expect(fetch).toHaveBeenCalledWith('https://dreamhack.io/api/v1/ctf/seasons/highlights/?user_id=20691', expect.anything());
     expect(history).toEqual([
-      { season: 1, tier: 'Silver III', tierClass: 'silver', rating: 1250 },
-      { season: 5, tier: 'Gold II', tierClass: 'gold', rating: 1635 },
+      { season: 1, tier: 'Silver III', tierClass: 'silver', rating: 1250, rank: 977 },
+      { season: 5, tier: 'Gold II', tierClass: 'gold', rating: 1635, rank: 79 },
     ]);
   });
 });

@@ -46,9 +46,18 @@ function hasNotStarted(seasons: TCtfSeason[], season: number, now: Date): boolea
   return !!info && now.getTime() < new Date(info.startsAt).getTime();
 }
 
-// 시즌별 결과 목록만 있고 시즌 상세 조회가 비어 있을 때 쓰는 값 (순위·대회 수는 모름)
+// 시즌별 결과 목록만 있고 시즌 상세 조회가 비어 있을 때 쓰는 값 (참가자 수·대회 수는 모름)
 function summaryToResult(summary: TCtfSeasonSummary): TCtfSeasonResult {
-  return { ...summary, rank: 0, participants: 0, contests: null, rounds: [] };
+  return {
+    season: summary.season,
+    tier: summary.tier,
+    tierClass: summary.tierClass,
+    rating: summary.rating,
+    rank: summary.rank ?? 0,
+    participants: 0,
+    contests: null,
+    rounds: [],
+  };
 }
 
 // CTF 시즌 카드 (/api/ctf?username=), view=graph면 대회별 레이팅 그래프, view=seasons면 시즌별 결과

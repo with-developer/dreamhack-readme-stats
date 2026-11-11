@@ -99,6 +99,12 @@ describe('generateCtfSeasonSvg 함수 테스트', () => {
     expect(parse(svg).querySelector('.accent')?.textContent).toBe('-');
   });
 
+  it('순위는 알고 참가자 수를 모르면 순위만 표시해야 함', () => {
+    const svg = generateCtfSeasonSvg('player', { ...finished, rank: 79, participants: 0, contests: null }, false);
+    expect(Array.from(parse(svg).querySelectorAll('.value')).map((el) => el.textContent)[0]).toBe('79');
+    expect(svg).not.toContain('79</tspan><tspan class="total"');
+  });
+
   it('Dreamhack이 참가 0회라고 준 시즌은 0으로 표시해야 함', () => {
     const svg = generateCtfSeasonSvg('player', { ...finished, contests: 0, rounds: [] }, false);
     expect(Array.from(parse(svg).querySelectorAll('.value')).map((el) => el.textContent)[1]).toBe('0');
