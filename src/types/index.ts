@@ -10,7 +10,12 @@ export interface TuserData {
   contributions: {
     level: number;
     rank: number;
+    // 현재 레벨에서 쌓은 경험치와 다음 레벨까지 필요한 경험치
+    exp?: number;
+    exp_needed?: number;
   };
+  // 대표 업적 (설정하지 않았으면 null)
+  representative?: { title?: string } | null;
   exp: number;
   total_wargame: number;
   wargame: {
