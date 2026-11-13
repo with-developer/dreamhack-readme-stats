@@ -26,6 +26,19 @@ export const errorCards = {
       'Only users on the wargame ranking are shown.',
     ],
   }),
+  invalidSeason: (title: string, value: string): TErrorCard => ({
+    title,
+    message: 'Invalid season',
+    details: [
+      `season: ${truncate(value, MAX_NICKNAME_LENGTH)}`,
+      'Use season=<number> or season=current.',
+    ],
+  }),
+  seasonNotFound: (title: string, season: number, latestSeason: number | null): TErrorCard => ({
+    title,
+    message: `Season ${season} not found`,
+    details: latestSeason ? [`Seasons 1-${latestSeason} are available.`] : ['Could not find CTF seasons.'],
+  }),
   fetchFailed: (title: string): TErrorCard => ({
     title,
     message: 'Failed to load stats',

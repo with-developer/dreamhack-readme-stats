@@ -1,4 +1,4 @@
-import { escapeXml } from '../../utils/svg';
+import { escapeXml, parseTheme, THEME_NAMES, themes } from '../../utils/svg';
 
 describe('escapeXml 함수 테스트', () => {
   it('XML 특수 문자를 이스케이프해야 함', () => {
@@ -19,5 +19,26 @@ describe('escapeXml 함수 테스트', () => {
 
   it('숫자도 문자열로 변환해야 함', () => {
     expect(escapeXml(5000)).toBe('5000');
+  });
+});
+
+describe('parseTheme 함수 테스트', () => {
+  it('지원하는 테마 이름은 그대로 돌려줘야 함', () => {
+    for (const name of THEME_NAMES) {
+      expect(parseTheme(name)).toBe(name);
+    }
+  });
+
+  it('모르는 값, 빈 값, 배열, Object 내장 속성 이름은 light로 처리해야 함', () => {
+    for (const value of [undefined, '', 'Dark', 'solarized', ['dark'], '__proto__', 'constructor', 'toString']) {
+      expect(parseTheme(value)).toBe('light');
+    }
+  });
+
+  it('모든 테마가 같은 색 항목을 가져야 함', () => {
+    const keys = Object.keys(themes.light).sort();
+    for (const name of THEME_NAMES) {
+      expect(Object.keys(themes[name]).sort()).toEqual(keys);
+    }
   });
 });

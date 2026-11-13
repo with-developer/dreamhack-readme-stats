@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { TCategoryData, TCategoryStats, Theme } from '../../types';
 import { generateCategorySvg } from '../../utils/generateCategorySvg';
+import { generateCategoryBarsSvg } from '../../utils/generateCategoryBarsSvg';
 import { generateErrorSvg, errorCards } from '../../utils/generateErrorSvg';
-import { sendSvg } from '../../utils/svg';
+import { parseTheme, sendSvg } from '../../utils/svg';
 import { getUserId, getUserData } from '../../utils/dreamhack';
 
 // 처음 조회하는 닉네임은 Dreamhack 검색이 여러 번 필요해 기본 10초를 넘을 수 있음
@@ -37,11 +38,18 @@ const defaultColors = [
   '#b2f2bb', '#d8f5a2', '#ffec99', '#ffc078', '#ffa8a8'
 ];
 
+// 막대형 레이아웃의 Others 색
+const BARS_OTHERS_COLOR = '#a78bfa';
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { username, theme: themeParam } = req.query;
+  const { username, theme: themeParam, layout: layoutParam } = req.query;
 
   // 테마 파라미터 검증
-  const theme: Theme = themeParam === 'dark' ? 'dark' : 'light';
+  const theme: Theme = parseTheme(themeParam);
+  // layout=bars면 막대형, 그 밖의 값은 기존 원형 차트
+  const layout = layoutParam === 'bars' ? 'bars' : 'pie';
+  const render = (stats: TCategoryStats) =>
+    layout === 'bars' ? generateCategoryBarsSvg(stats, theme) : generateCategorySvg(stats, theme);
 
   if (!username || typeof username !== 'string') {
     return sendSvg(res, generateErrorSvg(errorCards.missingUsername(CARD_TITLE), theme));
@@ -81,7 +89,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         categories: []
       };
 
-      const svg = generateCategorySvg(emptyStats, theme);
+      const svg = render(emptyStats);
       console.timeEnd('⏱️ 데이터 가공 및 SVG 생성');
       console.timeEnd('⏱️ 전체 API 실행 시간');
       return sendSvg(res, svg);
@@ -90,13 +98,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // 카테고리 데이터가 있는 경우 가공
     const categories: TCategoryData[] = categoryEntries.map(([name, data], index) => {
       // 카테고리에 해당하는 색상 선택 (미리 정의된 색상이 없으면 기본 팔레트에서 선택)
-      const color = categoryColors[name] || defaultColors[index % defaultColors.length];
-      
+      // 막대형에서는 Others를 Reversing(초록)과 구분되는 보라색으로 표시 (원형 차트 색은 그대로)
+      const color = layout === 'bars' && name === 'others'
+        ? BARS_OTHERS_COLOR
+        : categoryColors[name] || defaultColors[index % defaultColors.length];
+
       return {
         name,
         score: data?.score || 0,
         rank: data?.rank || 0,
-        color
+        color,
+        solved_cnt: data?.solved_cnt,
       };
     });
     
@@ -109,7 +121,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       categories
     };
 
-    const svg = generateCategorySvg(categoryStats, theme);
+    const svg = render(categoryStats);
     console.timeEnd('⏱️ 데이터 가공 및 SVG 생성');
 
     console.timeEnd('⏱️ 전체 API 실행 시간');
