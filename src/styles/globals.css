@@ -1,4 +1,51 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+/* 색은 모두 변수로 두고, 운영체제 다크 모드면 어두운 값으로 바꿈 */
+:root {
+    --bg: #f7f8fa;
+    --bg-grid: rgba(15, 23, 42, 0.06);
+    --surface: #ffffff;
+    --surface-2: #f1f3f6;
+    --line: #e3e7ee;
+    --line-strong: #cfd6e0;
+    --text: #0f172a;
+    --text-2: #475569;
+    --text-3: #8391a7;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --accent-soft: rgba(37, 99, 235, 0.1);
+    --accent-text: #ffffff;
+    --danger: #dc2626;
+    --code-bg: #0f172a;
+    --code-text: #e2e8f0;
+    --shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.06);
+    --shadow-lg: 0 2px 6px rgba(15, 23, 42, 0.08), 0 24px 48px rgba(15, 23, 42, 0.12);
+    --readme-light: #ffffff;
+    --readme-dark: #0d1117;
+    color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #0a0d12;
+        --bg-grid: rgba(148, 163, 184, 0.07);
+        --surface: #11161e;
+        --surface-2: #171d27;
+        --line: #232b37;
+        --line-strong: #313b4a;
+        --text: #e6ebf2;
+        --text-2: #a3aebf;
+        --text-3: #6b7789;
+        --accent: #60a5fa;
+        --accent-hover: #93c5fd;
+        --accent-soft: rgba(96, 165, 250, 0.14);
+        --accent-text: #0a0d12;
+        --danger: #f87171;
+        --code-bg: #0b1017;
+        --code-text: #dbe3ee;
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
+        --shadow-lg: 0 2px 6px rgba(0, 0, 0, 0.4), 0 24px 48px rgba(0, 0, 0, 0.45);
+        color-scheme: dark;
+    }
+}
 
 * {
     box-sizing: border-box;
@@ -6,14 +53,41 @@
     margin: 0;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 html,
 body {
     max-width: 100vw;
     overflow-x: hidden;
-    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    /* Inter(--font-sans)는 _app.tsx의 감싸는 요소에서 지정, 여기는 그 전에 쓰일 시스템 글꼴 */
+    font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
 }
 
 a {
     color: inherit;
     text-decoration: none;
+}
+
+button,
+input {
+    font: inherit;
+    color: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
 }

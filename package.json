@@ -12,7 +12,8 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "examples": "tsc -p scripts/examples && node .examples-build/scripts/examples/generate.js"
   },
   "dependencies": {
     "ioredis": "^5.5.0",

@@ -1,490 +1,863 @@
-.main {
+/* 레이아웃: 위쪽 소개(글 + 예시 카드 겹침) → 카드 만들기(왼쪽 고르기, 오른쪽 미리보기·코드 고정) → 바닥글 */
+
+.page {
     min-height: 100vh;
-    padding: 2rem 0;
-    flex: 1;
+    /* 한글이 단어 중간에서 줄바꿈되지 않게 */
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+    background:
+        radial-gradient(60rem 30rem at 85% -10%, var(--accent-soft), transparent 70%),
+        var(--bg);
+}
+
+.page code,
+.page pre {
+    font-family: var(--font-mono), ui-monospace, Menlo, Consolas, monospace;
+}
+
+/* ---------- 상단 바 ---------- */
+
+.nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    background: color-mix(in srgb, var(--bg) 78%, transparent);
+    border-bottom: 1px solid var(--line);
+}
+
+.navInner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.brandMark {
+    display: inline-grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: var(--text);
+    color: var(--bg);
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.brandName {
+    font-size: 0.98rem;
+    white-space: nowrap;
+}
+
+.navLinks {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    font-size: 0.92rem;
+    color: var(--text-2);
+}
+
+.navLinks a:hover {
+    color: var(--text);
+}
+
+.githubButton {
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 8px;
+    color: var(--text) !important;
+    background: var(--surface);
+}
+
+.githubButton:hover {
+    border-color: var(--text-3);
+}
+
+/* ---------- 소개 ---------- */
+
+.hero {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 5.5rem 1.5rem 4.5rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 3rem;
+    align-items: center;
+    position: relative;
+}
+
+.hero::before {
+    /* 은은한 격자 무늬 */
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(var(--bg-grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+    background-size: 32px 32px;
+    mask-image: radial-gradient(ellipse 70% 70% at 70% 40%, #000 30%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 70% 40%, #000 30%, transparent 75%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.heroText,
+.heroCards {
+    position: relative;
+    z-index: 1;
+}
+
+.eyebrow {
+    display: inline-block;
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    margin-bottom: 1.25rem;
+}
+
+.heroTitle {
+    font-size: clamp(2.3rem, 4.6vw, 3.6rem);
+    line-height: 1.12;
+    letter-spacing: -0.035em;
+    font-weight: 800;
+    text-wrap: balance;
+}
+
+.heroLead {
+    margin-top: 1.25rem;
+    font-size: 1.08rem;
+    line-height: 1.7;
+    color: var(--text-2);
+    max-width: 34rem;
+}
+
+.heroActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+}
+
+.heroFacts {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: var(--text-3);
+}
+
+.heroFacts strong {
+    color: var(--text);
+    font-weight: 700;
+}
+
+.heroCards {
+    height: 400px;
+}
+
+.heroCard {
+    position: absolute;
+    width: min(390px, 82%);
+    filter: drop-shadow(0 18px 30px rgba(15, 23, 42, 0.16));
+    transition: transform 0.4s ease;
+}
+
+.heroCard img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.heroCard0 {
+    top: 0;
+    right: 6%;
+    transform: rotate(2deg);
+}
+
+.heroCard1 {
+    top: 30%;
+    left: 0;
+    transform: rotate(-2.5deg);
+    z-index: 2;
+}
+
+.heroCard2 {
+    bottom: 0;
+    right: 0;
+    transform: rotate(1deg);
+}
+
+.heroCards:hover .heroCard0 {
+    transform: rotate(0deg) translateY(-6px);
+}
+
+.heroCards:hover .heroCard1 {
+    transform: rotate(0deg) translateX(-6px);
+}
+
+.heroCards:hover .heroCard2 {
+    transform: rotate(0deg) translateY(6px);
+}
+
+/* ---------- 버튼·입력 공통 ---------- */
+
+.primaryButton,
+.ghostButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    height: 44px;
+    padding: 0 1.25rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.primaryButton {
+    background: var(--accent);
+    color: var(--accent-text);
+    border: 1px solid transparent;
+}
+
+.primaryButton:hover {
+    background: var(--accent-hover);
+}
+
+.primaryButton:active {
+    transform: translateY(1px);
+}
+
+.ghostButton {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--line-strong);
+}
+
+.ghostButton:hover {
+    border-color: var(--text-3);
+}
+
+.primaryButton:focus-visible,
+.ghostButton:focus-visible,
+.cardOption:focus-visible,
+.themeChip:focus-visible,
+.segmented button:focus-visible,
+.tabs button:focus-visible,
+.copyButton:focus-visible,
+.navLinks a:focus-visible,
+.brand:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.input {
+    width: 100%;
+    height: 44px;
+    padding: 0 0.9rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    background: var(--surface);
+    font-size: 1rem;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input::placeholder {
+    color: var(--text-3);
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.input[aria-invalid='true'] {
+    border-color: var(--danger);
+}
+
+.fieldHelp,
+.fieldError {
+    margin-top: 0.5rem;
+    font-size: 0.84rem;
+    line-height: 1.5;
+    color: var(--text-3);
+}
+
+.fieldError {
+    color: var(--danger);
+}
+
+/* ---------- 카드 만들기 ---------- */
+
+.builder {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 5rem;
+    scroll-margin-top: 64px;
+}
+
+.sectionHead {
+    margin-bottom: 1.75rem;
+}
+
+.sectionHead h2 {
+    font-size: 1.75rem;
+    letter-spacing: -0.02em;
+    font-weight: 800;
+}
+
+.sectionHead p {
+    margin-top: 0.5rem;
+    color: var(--text-2);
+}
+
+.builderGrid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.controls {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    gap: 1rem;
+}
+
+.step {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+    padding: 1.25rem;
+    box-shadow: var(--shadow);
+}
+
+.stepTitle {
+    display: flex;
     align-items: center;
-}
-
-.divider {
-    width: 60%;
-    margin: 1rem 0;
-    border: 0;
-    height: 1px;
-    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
-}
-
-.title {
-    margin: 0;
-    line-height: 1.15;
-    font-size: 3rem;
-    text-align: center;
-}
-
-.description {
-    margin: 1rem 0;
-    line-height: 1.5;
-    font-size: 1.5rem;
-    text-align: center;
-}
-
-.exampleCard {
-    margin: 1rem 0;
-    padding: 1.5rem;
-    text-align: left;
-    color: inherit;
-    text-decoration: none;
-    border: 1px solid #eaeaea;
-    border-radius: 10px;
-    transition: color 0.15s ease, border-color 0.15s ease;
-    max-width: 800px;
+    gap: 0.6rem;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0.9rem;
+    padding: 0;
+    float: left;
     width: 100%;
 }
 
-.codeSection {
-    margin: 1rem 0;
+.stepTitle + * {
+    clear: both;
 }
 
-.codeHeader {
+.stepNumber {
+    display: inline-grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.nicknameRow {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
+    gap: 0.6rem;
 }
 
-.codeSection h3 {
-    margin: 0;
-    font-size: 1.2rem;
+.cardGrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.6rem;
 }
 
-.copyButton {
-    background: #6e45e2;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    font-size: 0.9rem;
+.cardOption {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    padding: 0.5rem 0.5rem 0.55rem;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface-2);
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    text-align: left;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
-.copyButton:hover {
-    background: #5a37c0;
+.cardOption:hover {
+    border-color: var(--line-strong);
 }
 
-.code {
-    background: #fafafa;
-    border-radius: 5px;
-    padding: 0.75rem;
-    font-size: 0.85rem;
-    font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
-        Bitstream Vera Sans Mono, Courier New, monospace;
+.cardThumb {
     display: block;
-    white-space: pre-wrap;
-    word-break: break-all;
-    line-height: 1.5;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 390 / 190;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #ffffff;
 }
 
-.codeHint {
-    margin: 0.5rem 0 0 0;
-    font-size: 0.8rem;
-    color: #666;
+.cardName {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-2);
 }
 
-.example {
-    margin: 0 0 2rem 0;
-    text-align: center;
+.cardOption.selected {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    box-shadow: 0 0 0 1px var(--accent);
 }
 
-.example h3 {
-    margin-bottom: 1rem;
+.cardOption.selected .cardName {
+    color: var(--accent);
 }
 
-.exampleLink {
-    display: inline-block;
-    transition: transform 0.2s ease;
+.seasonRow {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--line);
 }
 
-.exampleLink:hover {
-    transform: scale(1.02);
+.seasonRow label {
+    display: block;
+    font-size: 0.88rem;
+    font-weight: 600;
+    margin-bottom: 0.45rem;
 }
 
-@media (max-width: 600px) {
-    .title {
-        font-size: 3rem;
-    }
-
-    .description {
-        font-size: 1.2rem;
-    }
-
-    .code {
-        font-size: 0.8rem;
-    }
-
-    .copyButton {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.8rem;
-    }
+.seasonInput {
+    max-width: 220px;
 }
 
-.githubLink {
-    margin-top: 2rem;
-    text-align: center;
+.themeList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
-.socialLink {
+.themeChip {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    background-color: #24292e;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
+    height: 36px;
+    padding: 0 0.8rem 0 0.45rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface-2);
+    font-size: 0.88rem;
     font-weight: 500;
-    transition: background-color 0.3s ease;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
 }
 
-.socialLink:hover {
-    background-color: #181a1b;
+.themeChip:hover {
+    border-color: var(--line-strong);
 }
 
-.socialLink svg {
+.themeChip.selected {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+    color: var(--accent);
+    background: var(--accent-soft);
+}
+
+.swatch {
+    position: relative;
+    display: inline-flex;
     width: 24px;
     height: 24px;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid var(--line-strong);
+    flex-shrink: 0;
 }
 
-.themeDescription {
-    margin: 0.5rem 0 1.5rem 0;
-    color: #666;
+.swatchHalf {
+    flex: 1;
+}
+
+.swatchDot {
+    position: absolute;
+    right: 3px;
+    bottom: 3px;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+}
+
+.swatchTransparent {
+    background-color: #ffffff;
+    background-image:
+        linear-gradient(45deg, #d6dbe3 25%, transparent 25%),
+        linear-gradient(-45deg, #d6dbe3 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #d6dbe3 75%),
+        linear-gradient(-45deg, transparent 75%, #d6dbe3 75%);
+    background-size: 8px 8px;
+    background-position: 0 0, 0 4px, 4px -4px, -4px 0;
+}
+
+/* ---------- 미리보기·코드 ---------- */
+
+.output {
+    position: sticky;
+    top: 76px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.panel {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.panelHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.panelTitle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
     font-size: 0.95rem;
 }
 
-.themeDescription code {
-    background: #f0f0f0;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.85rem;
-}
-
-.themeGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 1.5rem;
-    margin-top: 1rem;
-}
-
-.themeItem {
-    text-align: center;
-    padding: 1rem;
-    border: 1px solid #eaeaea;
-    border-radius: 8px;
-    background: #fafafa;
-}
-
-.themeItem h4 {
-    margin: 0 0 0.3rem 0;
-    font-size: 1.1rem;
-    color: #333;
-}
-
-.themeDesc {
-    margin: 0 0 1rem 0;
-    font-size: 0.85rem;
-    color: #666;
-}
-
-.themeItem .codeSection {
-    margin-top: 1rem;
-    text-align: left;
-}
-
-.themeItem .codeSection .code {
-    font-size: 0.75rem;
-    background: #fff;
-}
-
-@media (max-width: 800px) {
-    .themeGrid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Config Panel */
-.configPanel {
-    max-width: 900px;
-    width: 100%;
-    padding: 1.5rem;
-    background: #fafafa;
-    border: 1px solid #eaeaea;
-    border-radius: 10px;
-    margin: 1rem 0;
-}
-
-.configRow {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    align-items: flex-end;
-}
-
-.inputGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    flex: 1;
-    min-width: 150px;
-}
-
-/* 카드 이름이 가장 길어서 다른 칸보다 넓게, 가장 긴 이름(Most Solved Categories (Bars))이 잘리지 않는 폭은 유지 */
-.cardGroup {
-    flex: 1.6;
-    min-width: 300px;
-}
-
-.inputGroup label {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #333;
-}
-
-.textInput {
-    padding: 0.75rem;
-    border: 1px solid #ddd;
+.badge {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.15rem 0.45rem;
     border-radius: 6px;
-    font-size: 1rem;
-    transition: border-color 0.2s ease;
+    background: var(--surface-2);
+    color: var(--text-3);
+    border: 1px solid var(--line);
 }
 
-.textInput:focus {
-    outline: none;
-    border-color: #6e45e2;
+.segmented {
+    display: inline-flex;
+    padding: 3px;
+    border-radius: 9px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
 }
 
-/* Custom Dropdown */
-.dropdown {
+.segmented button {
+    border: 0;
+    background: transparent;
+    padding: 0.25rem 0.7rem;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-2);
+    cursor: pointer;
+}
+
+.segmented button[aria-pressed='true'] {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+}
+
+.stage {
     position: relative;
-    width: 100%;
-}
-
-.dropdownTrigger {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 1rem;
-    background: white;
-    cursor: pointer;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    text-align: left;
-}
-
-/* 선택한 이름이 길어도 두 줄로 접히지 않게 한 줄로 두고, 넘치면 끝을 …로 줄임 */
-.dropdownTrigger > span {
-    flex: 1;
-    min-width: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    /* 한글이 섞여도 다른 입력칸과 높이가 같도록 줄 높이 고정 */
-    line-height: 1.125rem;
-}
-
-.dropdownTrigger:hover {
-    border-color: #bbb;
-}
-
-.dropdownTrigger.dropdownOpen {
-    border-color: #6e45e2;
-    box-shadow: 0 0 0 3px rgba(110, 69, 226, 0.1);
-}
-
-.dropdownArrow {
-    flex-shrink: 0;
-    margin-left: 0.5rem;
-    width: 16px;
-    height: 16px;
-    color: #666;
-    transition: transform 0.2s ease;
-}
-
-.dropdownOpen .dropdownArrow {
-    transform: rotate(180deg);
-}
-
-.dropdownMenu {
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
-    /* 목록은 가장 긴 항목 폭까지 넓어짐 (선택 칸보다 좁아지지는 않음) */
-    min-width: 100%;
-    width: max-content;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    list-style: none;
-    padding: 4px;
-    margin: 0;
-    z-index: 100;
-    animation: dropdownFadeIn 0.15s ease;
-}
-
-@keyframes dropdownFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-4px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.dropdownItem {
-    gap: 0.75rem;
-    white-space: nowrap;
-    padding: 0.65rem 0.75rem;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background-color 0.15s ease;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.dropdownItem:hover {
-    background: #f5f5f5;
-}
-
-.dropdownItemSelected {
-    background: #f0ebff;
-    color: #6e45e2;
-    font-weight: 500;
-}
-
-.dropdownItemSelected:hover {
-    background: #e8e0ff;
-}
-
-.checkIcon {
-    width: 16px;
-    height: 16px;
-    color: #6e45e2;
-}
-
-.previewButton {
-    padding: 0.75rem 1.5rem;
-    background: #6e45e2;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
+    display: grid;
+    place-items: center;
+    min-height: 260px;
+    padding: 2rem 1.25rem;
+    background: var(--readme-light);
+    background-image: radial-gradient(rgba(15, 23, 42, 0.07) 1px, transparent 1px);
+    background-size: 14px 14px;
     transition: background-color 0.2s ease;
-    white-space: nowrap;
 }
 
-.previewButton:hover {
-    background: #5a37c0;
-}
-
-.previewButton:disabled {
-    background: #999;
-    cursor: not-allowed;
-}
-
-/* Preview Section */
-.previewSection {
-    max-width: 900px;
-    width: 100%;
-    margin: 1.5rem 0;
-}
-
-.previewSection h2 {
-    margin: 0 0 1rem 0;
-    font-size: 1.3rem;
-}
-
-.previewContainer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 200px;
-    padding: 2rem;
-    background: #f5f5f5;
-    border: 1px solid #eaeaea;
-    border-radius: 10px;
+.stageDark {
+    background-color: var(--readme-dark);
+    background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
 }
 
 .previewImage {
+    display: block;
     max-width: 100%;
     height: auto;
 }
 
-.previewPlaceholder {
-    color: #999;
-    font-size: 1rem;
+.hidden {
+    visibility: hidden;
+    position: absolute;
 }
 
-/* Code Panel */
-.codePanel {
-    max-width: 900px;
-    width: 100%;
-    padding: 1.5rem;
-    background: #fafafa;
-    border: 1px solid #eaeaea;
+.skeleton {
+    width: min(390px, 100%);
+    aspect-ratio: 390 / 190;
+    border-radius: 12px;
+    background: linear-gradient(90deg, rgba(148, 163, 184, 0.16) 0%, rgba(148, 163, 184, 0.3) 50%, rgba(148, 163, 184, 0.16) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    from {
+        background-position: 100% 0;
+    }
+
+    to {
+        background-position: -100% 0;
+    }
+}
+
+.stageMessage {
+    font-size: 0.9rem;
+    color: #64748b;
+    text-align: center;
+}
+
+.stageDark .stageMessage {
+    color: #8b949e;
+}
+
+.panelNote {
+    padding: 0.7rem 1rem 0.8rem;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: var(--text-3);
+    border-top: 1px solid var(--line);
+}
+
+.panelNote code {
+    font-size: 0.8rem;
+    padding: 0.05rem 0.3rem;
+    border-radius: 4px;
+    background: var(--surface-2);
+}
+
+.tabs {
+    display: inline-flex;
+    gap: 0.25rem;
+}
+
+.tabs button {
+    white-space: nowrap;
+    border: 0;
+    background: transparent;
+    padding: 0.35rem 0.65rem;
+    border-radius: 7px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--text-3);
+    cursor: pointer;
+}
+
+.tabs button:hover {
+    color: var(--text);
+}
+
+.tabs .tabActive {
+    background: var(--surface-2);
+    color: var(--text);
+}
+
+.copyButton {
+    height: 32px;
+    padding: 0 0.85rem;
+    border-radius: 8px;
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.copyButton:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.code {
+    margin: 0;
+    padding: 1rem 1.1rem;
+    background: var(--code-bg);
+    color: var(--code-text);
+    font-size: 0.82rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 260px;
+    overflow: auto;
+}
+
+/* ---------- 바닥글·알림 ---------- */
+
+.footer {
+    border-top: 1px solid var(--line);
+}
+
+.footerInner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.75rem 1.5rem 2.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+    font-size: 0.86rem;
+    color: var(--text-3);
+}
+
+.footerLinks {
+    display: flex;
+    gap: 1.25rem;
+}
+
+.footerLinks a:hover {
+    color: var(--text);
+}
+
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    transform: translate(-50%, 16px);
+    padding: 0.65rem 1rem;
     border-radius: 10px;
-    margin: 1rem 0;
+    background: var(--text);
+    color: var(--bg);
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 50;
 }
 
-.codePanel h2 {
-    margin: 0 0 1rem 0;
-    font-size: 1.3rem;
+.toastShow {
+    opacity: 1;
+    transform: translate(-50%, 0);
 }
 
-/* Theme Comparison */
-.themeComparison {
-    max-width: 900px;
-    width: 100%;
-    margin: 2rem 0;
+/* ---------- 반응형 ---------- */
+
+@media (max-width: 400px) {
+    /* 아주 좁은 화면에서는 GitHub 버튼을 아이콘만 남겨 사이트 이름이 한 줄에 들어가게 */
+    .githubLabel {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+    }
+
+    .githubButton {
+        padding: 0.45rem;
+    }
 }
 
-.themeComparison h2 {
-    margin: 0 0 1rem 0;
-    font-size: 1.3rem;
+@media (max-width: 960px) {
+    .hero {
+        grid-template-columns: 1fr;
+        padding-top: 3.5rem;
+        gap: 2.5rem;
+    }
+
+    .heroCards {
+        height: 340px;
+        max-width: 520px;
+    }
+
+    .builderGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .output {
+        position: static;
+    }
 }
 
-.themeLabel {
-    display: block;
-    font-weight: 500;
-    margin-bottom: 0.75rem;
-    color: #333;
-}
-
-/* Responsive adjustments for config panel */
 @media (max-width: 600px) {
-    .configRow {
+    .navLinks a:not(.githubButton) {
+        display: none;
+    }
+
+    .brandName {
+        font-size: 0.9rem;
+    }
+
+    .hero {
+        padding: 2.5rem 1rem 2.5rem;
+    }
+
+    .heroCards {
+        height: 270px;
+    }
+
+    .builder {
+        padding: 1rem 1rem 3.5rem;
+    }
+
+    .cardGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .nicknameRow {
         flex-direction: column;
     }
 
-    .inputGroup {
-        width: 100%;
+    .step {
+        padding: 1rem;
     }
 
-    /* 한 줄에 한 칸씩 쌓이므로 최소 폭이 필요 없음 (좁은 휴대폰에서 가로 스크롤 방지) */
-    .cardGroup {
-        min-width: 0;
+    .tabExtra {
+        display: none;
     }
 
-    .previewButton {
-        width: 100%;
+    .navInner {
+        padding: 0.7rem 1rem;
+    }
+
+    .stage {
+        min-height: 200px;
+        padding: 1.25rem 0.75rem;
     }
 }
