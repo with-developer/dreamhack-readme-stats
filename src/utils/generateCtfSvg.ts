@@ -96,7 +96,8 @@ function fitNickname(nickname: string, availablePx: number, charPx: number): str
 
 function topPercentage(result: TCtfSeasonResult): string {
   if (!result.rank || !result.participants) return '-';
-  return `${((result.rank / result.participants) * 100).toFixed(2)}%`;
+  const percentage = (result.rank / result.participants) * 100;
+  return percentage < 0.01 ? '<0.01%' : `${percentage.toFixed(2)}%`;
 }
 
 // 시즌 카드 기본형: 시즌 티어·레이팅, 다음 티어까지 남은 점수(진행 중) 또는 시즌 중 최고 레이팅(종료), 시즌 순위·상위 %·참가 대회 수
@@ -196,7 +197,7 @@ const GRAPH_CSS = `
     .podium { font: 700 8px ${F}; }
     .end { font: 700 10px ${F}; }
     .tier-pill { font: 700 8.5px ${F}; fill: #ffffff; }
-    .season { font: 500 10px ${F}; }`;
+    .season { font: 500 9px ${F}; }`;
 
 // 시즌 카드 그래프형: 그 시즌 대회별 레이팅 (3등 안에 든 대회는 등수 표시). 이을 점이 둘 미만이면 기본형
 export function generateCtfGraphSvg(nickname: string, result: TCtfSeasonResult, live: boolean, theme: Theme = 'light'): string {
@@ -260,7 +261,8 @@ export function generateCtfHistorySvg(
 ): string {
   const colors = themes[theme];
   const points = seasons.slice(-CTF_HISTORY_MAX_SEASONS);
-  const x0 = 92, x1 = 340, y0 = 74, y1 = 166;
+  // 시즌 6개일 때도 아래 시즌 이름(9px, "Season 8*" 약 49px)끼리 붙지 않는 간격
+  const x0 = 88, x1 = 352, y0 = 74, y1 = 166;
   // 점 위 티어 알약(23px 위까지)이 들어갈 24px
   const { low, high, toY } = ratingScale(points.map((point) => point.rating), y0, y1, 24);
   const toX = (i: number) => (points.length === 1 ? (x0 + x1) / 2 : x0 + ((x1 - x0) * i) / (points.length - 1));

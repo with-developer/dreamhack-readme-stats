@@ -14,22 +14,22 @@ function isWide(codePoint: number): boolean {
   );
 }
 
-function charWidth(char: string): number {
-  return isWide(char.codePointAt(0) ?? 0) ? 2 : 1;
+function charWidth(char: string, wideWidth: number): number {
+  return isWide(char.codePointAt(0) ?? 0) ? wideWidth : 1;
 }
 
-// 영문 한 글자를 1로 센 표시 폭
-export function textWidth(value: string): number {
-  return Array.from(value).reduce((sum, char) => sum + charWidth(char), 0);
+// 영문 한 글자를 1로 센 표시 폭 (wideWidth: 한글 등 넓은 글자 한 자의 폭, 기본은 넉넉하게 2)
+export function textWidth(value: string, wideWidth = 2): number {
+  return Array.from(value).reduce((sum, char) => sum + charWidth(char, wideWidth), 0);
 }
 
 // 표시 폭이 maxWidth를 넘으면 끝을 '…'로 줄임 ('…'도 한 칸으로 셈)
-export function truncateToWidth(value: string, maxWidth: number): string {
-  if (textWidth(value) <= maxWidth) return value;
+export function truncateToWidth(value: string, maxWidth: number, wideWidth = 2): string {
+  if (textWidth(value, wideWidth) <= maxWidth) return value;
   let width = 0;
   let result = '';
   for (const char of Array.from(value)) {
-    const w = charWidth(char);
+    const w = charWidth(char, wideWidth);
     if (width + w > maxWidth - 1) break;
     result += char;
     width += w;

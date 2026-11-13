@@ -46,7 +46,7 @@ describe('generateSolvesSvg 함수 테스트', () => {
     expect(texts(doc, '.challenge')[1]).toBe('한글로된아주긴문제이…');
     expect(texts(doc, '.challenge')[2]).toBe('</text><script>x</scr…');
     expect(texts(doc, '.tag')[0]).toBe('forensic…');
-    expect(texts(doc, '.pill')).toEqual(['-', 'M', 'B3']);
+    expect(texts(doc, '.pill')).toEqual(['-', 'M4', 'B3']);
     expect(doc.querySelector('.nickname')?.textContent).toBe('<b>닉네임</b>');
   });
 

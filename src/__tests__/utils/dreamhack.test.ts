@@ -303,6 +303,9 @@ describe('dreamhack 유틸리티 함수 테스트', () => {
 
     it('rank가 null일 때 N/A를 반환해야 함', () => {
       const result = calculateTopPercentage(null, 1000);
+      // 1위 / 33391명처럼 0.01% 미만이면 0.00 대신 <0.01
+      expect(calculateTopPercentage(1, 33391)).toBe('<0.01');
+      expect(calculateTopPercentage(4, 33391)).toBe('0.01');
       expect(result).toBe('N/A');
     });
 

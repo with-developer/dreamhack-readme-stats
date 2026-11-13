@@ -49,7 +49,7 @@ export function tierColor(theme: Theme, tierClass: string): string {
 }
 
 // 문제 난이도 숫자 → 계열과 짧은 표시 (예: 14 → Platinum 4 → 'P4')
-// 0 Unrated, 1 Sprout, 2~5 Bronze 4~1, 6~9 Silver, 10~13 Gold, 14~17 Platinum, 18~21 Diamond, 22 이상 Master
+// 0 Unrated, 1 Sprout, 2~5 Bronze 4~1, 6~9 Silver, 10~13 Gold, 14~17 Platinum, 18~21 Diamond, 22~25 Master 4~1
 export function challengeTier(tier: number): { tierClass: TTierClass; short: string } {
   if (!tier || tier < 1) return { tierClass: 'unranked', short: '-' };
   if (tier === 1) return { tierClass: 'sprout', short: 'Sp' };
@@ -59,6 +59,7 @@ export function challengeTier(tier: number): { tierClass: TTierClass; short: str
     ['gold', 'G', 10],
     ['platinum', 'P', 14],
     ['diamond', 'D', 18],
+    ['master', 'M', 22],
   ];
   for (const [tierClass, letter, start] of groups) {
     if (tier < start + 4) return { tierClass, short: `${letter}${4 - (tier - start)}` };

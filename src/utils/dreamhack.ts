@@ -344,5 +344,6 @@ export async function getCtfSeasonHistory(userId: number): Promise<TCtfSeasonSum
 export function calculateTopPercentage(rank: number | null, totalRanks: number | null): string {
   if (!rank || !totalRanks) return 'N/A';
   const percentage = (rank / totalRanks) * 100;
-  return percentage.toFixed(2);
+  // 1위처럼 아주 작은 값이 0.00%로 보이지 않도록
+  return percentage < 0.01 ? '<0.01' : percentage.toFixed(2);
 } 

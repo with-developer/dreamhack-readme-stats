@@ -20,7 +20,10 @@ describe('challengeTier 함수 테스트', () => {
     expect(challengeTier(5).short).toBe('B1');
     expect(challengeTier(6).short).toBe('S4');
     expect(challengeTier(21).short).toBe('D1');
-    expect(challengeTier(22)).toEqual({ tierClass: 'master', short: 'M' });
+    // 실제 응답: 22 → Master 4
+    expect(challengeTier(22)).toEqual({ tierClass: 'master', short: 'M4' });
+    expect(challengeTier(25)).toEqual({ tierClass: 'master', short: 'M1' });
+    expect(challengeTier(26)).toEqual({ tierClass: 'master', short: 'M' });
   });
 });
 
