@@ -37,13 +37,13 @@ describe('generateSolvesSvg 함수 테스트', () => {
   it('긴 문제 이름·한글 이름은 폭에 맞게 줄이고 특수문자는 이스케이프해야 함', () => {
     const doc = parse(generateSolvesSvg('recent', '<b>닉네임</b>', [
       { title: 'A very long challenge title that overflows', tier: 0, tags: ['forensics', 'misc', 'web'], solvedAt: '', solvers: 0 },
-      { title: '한글로된아주긴문제이름입니다', tier: 22, tags: ['web3'], solvedAt: '2024-01-01', solvers: 5 },
+      { title: '한글로된아주아주긴문제이름입니다정말로', tier: 22, tags: ['web3'], solvedAt: '2024-01-01', solvers: 5 },
       { title: '</text><script>x</script>', tier: 3, tags: [], solvedAt: '2024-01-01', solvers: 5 },
     ]));
     expect(doc.getElementsByTagName('parsererror')).toHaveLength(0);
     expect(doc.getElementsByTagName('script')).toHaveLength(0);
     expect(texts(doc, '.challenge')[0]).toBe('A very long challenge…');
-    expect(texts(doc, '.challenge')[1]).toBe('한글로된아주긴문제이…');
+    expect(texts(doc, '.challenge')[1]).toBe('한글로된아주아주긴문제이름입…');
     expect(texts(doc, '.challenge')[2]).toBe('</text><script>x</scr…');
     expect(texts(doc, '.tag')[0]).toBe('forensic…');
     expect(texts(doc, '.pill')).toEqual(['-', 'M4', 'B3']);

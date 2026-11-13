@@ -91,7 +91,7 @@ function statBox(x: number, label: string, valueSvg: string, colors: ThemeColors
 
 // 닉네임이 오른쪽 글자와 겹치지 않도록 남은 폭에 맞춰 줄임
 function fitNickname(nickname: string, availablePx: number, charPx: number): string {
-  return truncateToWidth(nickname, Math.max(4, Math.floor(availablePx / charPx)));
+  return truncateToWidth(nickname, Math.max(4, availablePx / charPx));
 }
 
 function topPercentage(result: TCtfSeasonResult): string {
@@ -128,7 +128,7 @@ export function generateCtfSeasonSvg(nickname: string, result: TCtfSeasonResult,
 
   const tierText = result.tier || group.name;
   const tierWidth = textWidth(tierText) * 10.8;
-  const name = fitNickname(nickname, 370 - tierWidth - 16 - 20, 15.6);
+  const name = fitNickname(nickname, 370 - tierWidth - 10 - 20, 15.6);
   // 참가자 수를 모르면 순위만 표시
   const rankValue = !result.rank
     ? '<tspan class="value">-</tspan>'
@@ -229,7 +229,7 @@ export function generateCtfGraphSvg(nickname: string, result: TCtfSeasonResult, 
   const lastX = toX(last), lastY = toY(result.rating);
   const tierText = result.tier || ctfTierGroup(result.rating).name;
   const right = headerRight(theme, tierText, result.tierClass, result.rating, 64);
-  const name = fitNickname(nickname, 370 - right.width - 16 - 20, 13.2);
+  const name = fitNickname(nickname, 370 - right.width - 10 - 20, 13.2);
   const rankText = !result.rank ? '-' : result.participants ? `#${result.rank}/${result.participants}` : `#${result.rank}`;
 
   const body = `
@@ -288,7 +288,7 @@ export function generateCtfHistorySvg(
 
   const latest = points[points.length - 1];
   const right = headerRight(theme, latest.tier || ctfTierGroup(latest.rating).name, latest.tierClass, latest.rating, 60);
-  const name = fitNickname(nickname, 370 - right.width - 16 - 20, 13.2);
+  const name = fitNickname(nickname, 370 - right.width - 10 - 20, 13.2);
 
   const body = `
   <text x="20" y="30" class="title">Dreamhack CTF Seasons</text>

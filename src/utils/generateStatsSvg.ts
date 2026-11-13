@@ -7,9 +7,9 @@ export function generateStatsSvg(stats: Tstats, theme: Theme = 'light'): string 
   const colors = themes[theme];
 
   // 닉네임(28px, 영문 한 글자 16.8px)이 오른쪽 TOP 값(20px, 한 글자 12px, x=325 가운데 정렬)과 겹치지 않게
-  // 남는 폭에 맞춰 줄임. 한글은 대체 글꼴에서 영문의 약 1.5배 폭이라 그 비율로 셈 (지금 들어맞는 이름은 그대로)
+  // 남는 폭에 맞춰 줄임 (지금 들어맞는 이름은 그대로)
   const topLeft = 325 - (`${stats.wargameRankPercentage}%`.length * 12) / 2;
-  const nickname = truncateToWidth(stats.nickname, (topLeft - 8 - 20) / 16.8, 1.5);
+  const nickname = truncateToWidth(stats.nickname, (topLeft - 8 - 20) / 16.8);
 
   const rankParts = stats.wargame_rank.split('/');
   const rankDisplay = rankParts.length === 2
