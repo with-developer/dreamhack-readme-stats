@@ -18,6 +18,8 @@ import {
 interface DropdownOption<T> {
   value: T;
   label: string;
+  // 선택 칸에 보일 짧은 이름 (펼친 목록에는 label 전체)
+  shortLabel?: string;
 }
 
 interface CustomDropdownProps<T> {
@@ -50,7 +52,7 @@ function CustomDropdown<T extends string>({ options, value, onChange, placeholde
         className={`${styles.dropdownTrigger} ${isOpen ? styles.dropdownOpen : ''}`}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span>{selectedOption?.label || placeholder}</span>
+        <span>{selectedOption?.shortLabel || selectedOption?.label || placeholder}</span>
         <svg className={styles.dropdownArrow} viewBox="0 0 20 20" fill="currentColor">
           <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
         </svg>
@@ -113,6 +115,7 @@ export default function Home() {
   const themeOptions: DropdownOption<ThemeChoice>[] = (Object.keys(THEME_LABELS) as ThemeChoice[]).map((value) => ({
     value,
     label: THEME_LABELS[value],
+    ...(value === 'auto' ? { shortLabel: 'Auto' } : {}),
   }));
 
   const baseUrl = 'https://dreamhack-readme-stats.vercel.app';
@@ -189,7 +192,7 @@ export default function Home() {
               />
             </div>
 
-            <div className={styles.inputGroup}>
+            <div className={`${styles.inputGroup} ${styles.cardGroup}`}>
               <label>카드 종류</label>
               <CustomDropdown
                 options={cardOptions}
@@ -206,7 +209,7 @@ export default function Home() {
                   id="season"
                   value={season}
                   onChange={(e) => setSeason(e.target.value)}
-                  placeholder="비우면 마지막 참가 시즌"
+                  placeholder="비우면 최근 시즌"
                   className={styles.textInput}
                   aria-invalid={seasonInvalid}
                 />
