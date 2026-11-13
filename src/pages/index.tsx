@@ -319,7 +319,7 @@ export default function Home() {
             <div className={styles.themeItem}>
               <span className={styles.themeLabel}>Light</span>
               <img
-                src="/api/stats?username=weakness&theme=light"
+                src="/examples/stats.svg"
                 alt="Light theme example"
                 width={350}
                 height={170}
@@ -328,7 +328,7 @@ export default function Home() {
             <div className={styles.themeItem}>
               <span className={styles.themeLabel}>Dark</span>
               <img
-                src="/api/stats?username=weakness&theme=dark"
+                src="/examples/stats-dark.svg"
                 alt="Dark theme example"
                 width={350}
                 height={170}

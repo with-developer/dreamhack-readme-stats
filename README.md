@@ -12,13 +12,13 @@
 
 <br />
 
-![Dreamhack Stats](https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness)
-![Dreamhack Category Chart](https://dreamhack-readme-stats.vercel.app/api/most-solved?username=weakness)
+![Dreamhack Stats](public/examples/stats.svg)
+![Dreamhack Category Chart](public/examples/most-solved.svg)
 
-![Dreamhack CTF](https://dreamhack-readme-stats.vercel.app/api/ctf?username=weakness)
-![Dreamhack Recent Solves](https://dreamhack-readme-stats.vercel.app/api/solves?username=weakness)
+![Dreamhack CTF](public/examples/ctf.svg)
+![Dreamhack Recent Solves](public/examples/solves.svg)
 
-![Dreamhack Level](https://dreamhack-readme-stats.vercel.app/api/level?username=weakness)
+![Dreamhack Level](public/examples/level.svg)
 
 </div>
 
@@ -44,7 +44,7 @@
 
 해결한 문제 수, 랭킹, 점수, 상위 %를 보여줍니다.
 
-![Dreamhack Stats](https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness)
+![Dreamhack Stats](public/examples/stats.svg)
 
 ```markdown
 ![Dreamhack Stats](https://dreamhack-readme-stats.vercel.app/api/stats?username=사용자명)
@@ -54,8 +54,8 @@
 
 분야별 점수 비율을 원형 차트로 보여줍니다. `layout=bars`를 붙이면 분야별 점수·푼 문제 수·분야 순위를 막대로 보여줍니다.
 
-![Dreamhack Category Chart](https://dreamhack-readme-stats.vercel.app/api/most-solved?username=weakness)
-![Dreamhack Category Bars](https://dreamhack-readme-stats.vercel.app/api/most-solved?username=weakness&layout=bars)
+![Dreamhack Category Chart](public/examples/most-solved.svg)
+![Dreamhack Category Bars](public/examples/most-solved-bars.svg)
 
 ```markdown
 ![Dreamhack Categories](https://dreamhack-readme-stats.vercel.app/api/most-solved?username=사용자명)
@@ -68,8 +68,10 @@ Dreamhack CTF 티어와 레이팅은 시즌마다 새로 시작하므로, 카드
 
 `view=graph`는 그 시즌의 대회별 레이팅 그래프, `view=seasons`는 시즌마다 끝났을 때의 티어를 보여줍니다. 시즌은 `season`으로 고를 수 있습니다.
 
-![Dreamhack CTF](https://dreamhack-readme-stats.vercel.app/api/ctf?username=weakness)
-![Dreamhack CTF Seasons](https://dreamhack-readme-stats.vercel.app/api/ctf?username=weakness&view=seasons)
+![Dreamhack CTF](public/examples/ctf.svg)
+![Dreamhack CTF Graph](public/examples/ctf-graph.svg)
+
+![Dreamhack CTF Seasons](public/examples/ctf-seasons.svg)
 
 ```markdown
 ![Dreamhack CTF](https://dreamhack-readme-stats.vercel.app/api/ctf?username=사용자명)
@@ -81,7 +83,8 @@ Dreamhack CTF 티어와 레이팅은 시즌마다 새로 시작하므로, 카드
 
 최근 푼 문제 5개를 난이도와 함께 보여줍니다. `sort=hardest`를 붙이면 가장 어려운 문제 5개와 각 문제를 푼 사람 수를 보여줍니다.
 
-![Dreamhack Recent Solves](https://dreamhack-readme-stats.vercel.app/api/solves?username=weakness)
+![Dreamhack Recent Solves](public/examples/solves.svg)
+![Dreamhack Hardest Solves](public/examples/solves-hardest.svg)
 
 ```markdown
 ![Dreamhack Recent Solves](https://dreamhack-readme-stats.vercel.app/api/solves?username=사용자명)
@@ -92,7 +95,7 @@ Dreamhack CTF 티어와 레이팅은 시즌마다 새로 시작하므로, 카드
 
 기여도 레벨, 다음 레벨까지 경험치, 기여도 순위, 워게임 상위 %, 대표 업적을 작은 배지로 보여줍니다.
 
-![Dreamhack Level](https://dreamhack-readme-stats.vercel.app/api/level?username=weakness)
+![Dreamhack Level](public/examples/level.svg)
 
 ```markdown
 ![Dreamhack Level](https://dreamhack-readme-stats.vercel.app/api/level?username=사용자명)
@@ -118,19 +121,19 @@ Dreamhack CTF 티어와 레이팅은 시즌마다 새로 시작하므로, 카드
 
 <table>
   <tr>
-    <td align="center"><code>light</code><br /><img src="https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness" width="360" alt="light 테마" /></td>
-    <td align="center"><code>dark</code><br /><img src="https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness&theme=dark" width="360" alt="dark 테마" /></td>
+    <td align="center"><code>light</code><br /><img src="public/examples/stats.svg" width="360" alt="light 테마" /></td>
+    <td align="center"><code>dark</code><br /><img src="public/examples/stats-dark.svg" width="360" alt="dark 테마" /></td>
   </tr>
   <tr>
-    <td align="center"><code>dracula</code><br /><img src="https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness&theme=dracula" width="360" alt="dracula 테마" /></td>
-    <td align="center"><code>tokyonight</code><br /><img src="https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness&theme=tokyonight" width="360" alt="tokyonight 테마" /></td>
+    <td align="center"><code>dracula</code><br /><img src="public/examples/stats-dracula.svg" width="360" alt="dracula 테마" /></td>
+    <td align="center"><code>tokyonight</code><br /><img src="public/examples/stats-tokyonight.svg" width="360" alt="tokyonight 테마" /></td>
   </tr>
   <tr>
-    <td align="center"><code>nord</code><br /><img src="https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness&theme=nord" width="360" alt="nord 테마" /></td>
-    <td align="center"><code>gruvbox</code><br /><img src="https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness&theme=gruvbox" width="360" alt="gruvbox 테마" /></td>
+    <td align="center"><code>nord</code><br /><img src="public/examples/stats-nord.svg" width="360" alt="nord 테마" /></td>
+    <td align="center"><code>gruvbox</code><br /><img src="public/examples/stats-gruvbox.svg" width="360" alt="gruvbox 테마" /></td>
   </tr>
   <tr>
-    <td align="center"><code>transparent</code><br /><img src="https://dreamhack-readme-stats.vercel.app/api/stats?username=weakness&theme=transparent" width="360" alt="transparent 테마" /></td>
+    <td align="center"><code>transparent</code><br /><img src="public/examples/stats-transparent.svg" width="360" alt="transparent 테마" /></td>
     <td></td>
   </tr>
 </table>
@@ -205,6 +208,14 @@ http://localhost:3000 에서 확인
 |----------|----------|-------------|
 | `REDIS_URL` | No | Redis 연결 URL (닉네임 → 사용자 ID 캐싱용) |
 | `GITHUB_TOKEN` | No | GitHub API 토큰 (Used By 배지의 사용자 수 집계용) |
+
+### Example Images
+
+README와 메인 페이지의 예시 카드(`public/examples/`)는 목업 데이터로 만든 이미지입니다. 카드 디자인을 바꾼 뒤에는 다시 만드세요.
+
+```bash
+npm run examples
+```
 
 ### Tech Stack
 
