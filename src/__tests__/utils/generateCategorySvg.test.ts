@@ -176,3 +176,42 @@ describe('generateCategorySvg 유틸리티 함수 테스트', () => {
     expect(result).toContain('url(data:font/woff2;base64,');
   });
 }); 
+describe('generateCategorySvg 원형 차트 가운데 구멍 테스트', () => {
+  const stats: TCategoryStats = {
+    nickname: 'weakness',
+    total_score: 3000,
+    categories: [
+      { name: 'web', score: 2000, rank: 50, color: '#ff6b6b' },
+      { name: 'pwnable', score: 1000, rank: 100, color: '#339af0' },
+    ],
+  };
+
+  it('가운데를 배경색 원으로 덮지 않고 마스크로 뚫어야 함 (transparent 테마에서도 구멍이 보이도록)', () => {
+    for (const theme of ['light', 'transparent'] as const) {
+      const result = generateCategorySvg(stats, theme);
+      const doc = new DOMParser().parseFromString(result.trim(), 'image/svg+xml');
+      expect(doc.getElementsByTagName('parsererror')).toHaveLength(0);
+      expect(doc.querySelector('mask#pie-hole circle')?.getAttribute('fill')).toBe('black');
+      expect(doc.querySelector('g[mask="url(#pie-hole)"] path')).not.toBeNull();
+      expect(result).toContain('Total');
+      expect(result).toContain('3000');
+    }
+  });
+});
+
+describe('generateCategorySvg 조각 경계선 테스트', () => {
+  it('배경이 없는 transparent 테마에서도 조각 사이 경계선을 그려야 함', () => {
+    const result = generateCategorySvg({
+      nickname: 'weakness',
+      total_score: 300,
+      categories: [
+        { name: 'web', score: 200, rank: 1, color: '#ff6b6b' },
+        { name: 'crypto', score: 100, rank: 2, color: '#fcc419' },
+      ],
+    }, 'transparent');
+    const doc = new DOMParser().parseFromString(result.trim(), 'image/svg+xml');
+    const strokes = Array.from(doc.querySelectorAll('g[mask="url(#pie-hole)"] path')).map((el) => el.getAttribute('stroke'));
+    expect(strokes).toHaveLength(2);
+    expect(strokes.every((stroke) => stroke && stroke !== 'none')).toBe(true);
+  });
+});

@@ -1,9 +1,15 @@
 import { Tstats, Theme } from '../types';
 import { escapeXml, themes } from './svg';
+import { truncateToWidth } from './text';
 import { jetBrainsMonoFontFace } from './fonts/jetbrainsMono';
 
 export function generateStatsSvg(stats: Tstats, theme: Theme = 'light'): string {
   const colors = themes[theme];
+
+  // 닉네임(28px, 영문 한 글자 16.8px)이 오른쪽 TOP 값(20px, 한 글자 12px, x=325 가운데 정렬)과 겹치지 않게
+  // 남는 폭에 맞춰 줄임 (지금 들어맞는 이름은 그대로)
+  const topLeft = 325 - (`${stats.wargameRankPercentage}%`.length * 12) / 2;
+  const nickname = truncateToWidth(stats.nickname, (topLeft - 8 - 20) / 16.8);
 
   const rankParts = stats.wargame_rank.split('/');
   const rankDisplay = rankParts.length === 2
@@ -30,7 +36,7 @@ export function generateStatsSvg(stats: Tstats, theme: Theme = 'light'): string 
   <text x="20" y="30" class="title">Dreamhack Wargame Stats</text>
 
   <!-- 닉네임 (타이틀과 하단 박스 중앙) -->
-  <text x="20" y="75" class="user-name">${escapeXml(stats.nickname)}</text>
+  <text x="20" y="75" class="user-name">${escapeXml(nickname)}</text>
 
   <!-- TOP % (우측, 닉네임과 동일 높이) -->
   <g transform="translate(280, 26)">

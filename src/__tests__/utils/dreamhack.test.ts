@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 // 서버 코드 테스트라 Node 환경에서 실행 (jsdom에는 AbortSignal.timeout이 없음)
-import { getLastRank, getUserId, getUserData, calculateTopPercentage } from '../../utils/dreamhack';
+import { getLastRank, getUserId, getUserData, calculateTopPercentage, getUserSolves } from '../../utils/dreamhack';
 import { TgetLastRankResponse, TUserRankingResponse, TuserData } from '../../types';
 import * as redisUtils from '../../utils/redis';
 
@@ -303,6 +303,9 @@ describe('dreamhack 유틸리티 함수 테스트', () => {
 
     it('rank가 null일 때 N/A를 반환해야 함', () => {
       const result = calculateTopPercentage(null, 1000);
+      // 1위 / 33391명처럼 0.01% 미만이면 0.00 대신 <0.01
+      expect(calculateTopPercentage(1, 33391)).toBe('<0.01');
+      expect(calculateTopPercentage(4, 33391)).toBe('0.01');
       expect(result).toBe('N/A');
     });
 
@@ -310,5 +313,39 @@ describe('dreamhack 유틸리티 함수 테스트', () => {
       const result = calculateTopPercentage(200, null);
       expect(result).toBe('N/A');
     });
+  });
+});
+
+describe('getUserSolves 함수 테스트', () => {
+  beforeEach(() => {
+    (fetch as jest.Mock).mockReset();
+    jest.spyOn(console, 'time').mockImplementation();
+    jest.spyOn(console, 'timeEnd').mockImplementation();
+  });
+
+  const record = {
+    solved_at: '2024-08-13T22:50:06.610753+09:00',
+    challenge: { title: 'Chaining', tier: 14, tags: ['reversing'], cnt_solvers: 103, author: { nickname: 'x' } },
+  };
+
+  it('정렬에 맞는 주소로 조회하고 카드에 필요한 값만 추려야 함', async () => {
+    (fetch as jest.Mock).mockResolvedValue({ ok: true, json: jest.fn().mockResolvedValue({ results: [record, {}] }) });
+
+    const recent = await getUserSolves(20691, 'recent', 5);
+    expect((fetch as jest.Mock).mock.calls[0][0]).toBe(
+      'https://dreamhack.io/api/v1/wargame/stats/?user_id=20691&limit=5&offset=0&ordering=-solved_at'
+    );
+    // 문제 정보가 빠진 기록({})은 건너뜀
+    expect(recent).toEqual([
+      { title: 'Chaining', tier: 14, tags: ['reversing'], solvedAt: '2024-08-13T22:50:06.610753+09:00', solvers: 103 },
+    ]);
+
+    await getUserSolves(20691, 'hardest', 5);
+    expect((fetch as jest.Mock).mock.calls[1][0]).toContain('ordering=-challenge__tier');
+  });
+
+  it('응답이 실패면 예외를 던져야 함', async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({ ok: false, status: 503 });
+    await expect(getUserSolves(20691, 'recent', 5)).rejects.toThrow('503');
   });
 });

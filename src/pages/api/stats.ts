@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { Tstats, Theme } from '../../types';
 import { generateStatsSvg } from '../../utils/generateStatsSvg';
 import { generateErrorSvg, errorCards } from '../../utils/generateErrorSvg';
-import { sendSvg } from '../../utils/svg';
+import { parseTheme, sendSvg } from '../../utils/svg';
 import {
   getLastRank,
   calculateTopPercentage,
@@ -30,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { username, theme: themeParam } = req.query;
 
   // 테마 파라미터 검증
-  const theme: Theme = themeParam === 'dark' ? 'dark' : 'light';
+  const theme: Theme = parseTheme(themeParam);
 
   if (!username || typeof username !== 'string') {
     return sendSvg(res, generateErrorSvg(errorCards.missingUsername(CARD_TITLE), theme));

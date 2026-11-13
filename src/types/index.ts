@@ -1,9 +1,21 @@
+// 프로필 API의 분야별 워게임 기록
+export interface TCategoryEntry {
+  score: number;
+  rank: number;
+  solved_cnt?: number;
+}
+
 export interface TuserData {
   nickname: string;
   contributions: {
     level: number;
     rank: number;
+    // 현재 레벨에서 쌓은 경험치와 다음 레벨까지 필요한 경험치
+    exp?: number;
+    exp_needed?: number;
   };
+  // 대표 업적 (설정하지 않았으면 null)
+  representative?: { title?: string } | null;
   exp: number;
   total_wargame: number;
   wargame: {
@@ -11,26 +23,11 @@ export interface TuserData {
     rank: number;
     score: number;
     category?: {
-      pwnable?: {
-        score: number;
-        rank: number;
-      };
-      reversing?: {
-        score: number;
-        rank: number;
-      };
-      web?: {
-        score: number;
-        rank: number;
-      };
-      crypto?: {
-        score: number;
-        rank: number;
-      };
-      [key: string]: {
-        score: number;
-        rank: number;
-      } | undefined;
+      pwnable?: TCategoryEntry;
+      reversing?: TCategoryEntry;
+      web?: TCategoryEntry;
+      crypto?: TCategoryEntry;
+      [key: string]: TCategoryEntry | undefined;
     };
   };
   ctf: {
@@ -68,6 +65,7 @@ export interface TCategoryData {
   score: number;
   rank: number;
   color: string;
+  solved_cnt?: number;
 }
 
 export interface TCategoryStats {
@@ -76,7 +74,53 @@ export interface TCategoryStats {
   categories: TCategoryData[];
 }
 
-export type Theme = 'light' | 'dark';
+// CTF 시즌 (시즌마다 레이팅이 새로 시작함)
+export interface TCtfSeason {
+  number: number;
+  startsAt: string;
+  endsAt: string;
+}
+
+// 한 시즌의 대회 한 번 (대회 직후 레이팅과 그 대회 등수)
+export interface TCtfRound {
+  round: number;
+  rating: number;
+  rank: number | null;
+}
+
+// 한 시즌의 공식 결과 (진행 중인 시즌이면 지금까지의 값)
+export interface TCtfSeasonResult {
+  season: number;
+  tier: string;
+  tierClass: string;
+  rating: number;
+  rank: number;
+  participants: number;
+  // 참가 대회 수 (시즌 상세가 비어 결과 목록 값으로 대신 보여줄 때는 모름 = null)
+  contests: number | null;
+  rounds: TCtfRound[];
+}
+
+// 시즌별 결과 목록의 한 줄 (끝난 시즌만 Dreamhack이 줌)
+export interface TCtfSeasonSummary {
+  season: number;
+  tier: string;
+  tierClass: string;
+  rating: number;
+  // 시즌 순위 (목록 API가 주는 값, 없으면 생략)
+  rank?: number;
+}
+
+// 풀이 기록 한 건 (카드에 필요한 값만 추림)
+export interface TSolveRecord {
+  title: string;
+  tier: number;
+  tags: string[];
+  solvedAt: string;
+  solvers: number;
+}
+
+export type Theme = 'light' | 'dark' | 'dracula' | 'tokyonight' | 'nord' | 'gruvbox' | 'transparent';
 
 export interface TErrorCard {
   title: string;
@@ -92,4 +136,10 @@ export interface ThemeColors {
   text: string;
   subText: string;
   accent: string;
+  // 진행 막대의 빈 부분 (transparent 테마는 테두리가 없어서 border와 따로 둠)
+  track: string;
+  // 도형 사이를 떼어 보이게 하는 선·속이 빈 점의 색 (배경이 있는 테마는 배경색)
+  knockout: string;
+  // 밝은 배경용인지 (티어 색 진하기와 구간 배경 농도를 고를 때 사용)
+  scheme: 'light' | 'dark';
 } 

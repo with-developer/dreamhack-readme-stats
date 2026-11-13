@@ -239,6 +239,12 @@
     min-width: 150px;
 }
 
+/* 카드 이름이 가장 길어서 다른 칸보다 넓게, 가장 긴 이름(Most Solved Categories (Bars))이 잘리지 않는 폭은 유지 */
+.cardGroup {
+    flex: 1.6;
+    min-width: 300px;
+}
+
 .inputGroup label {
     font-size: 0.9rem;
     font-weight: 500;
@@ -279,6 +285,17 @@
     text-align: left;
 }
 
+/* 선택한 이름이 길어도 두 줄로 접히지 않게 한 줄로 두고, 넘치면 끝을 …로 줄임 */
+.dropdownTrigger > span {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* 한글이 섞여도 다른 입력칸과 높이가 같도록 줄 높이 고정 */
+    line-height: 1.125rem;
+}
+
 .dropdownTrigger:hover {
     border-color: #bbb;
 }
@@ -289,6 +306,8 @@
 }
 
 .dropdownArrow {
+    flex-shrink: 0;
+    margin-left: 0.5rem;
     width: 16px;
     height: 16px;
     color: #666;
@@ -303,7 +322,9 @@
     position: absolute;
     top: calc(100% + 4px);
     left: 0;
-    right: 0;
+    /* 목록은 가장 긴 항목 폭까지 넓어짐 (선택 칸보다 좁아지지는 않음) */
+    min-width: 100%;
+    width: max-content;
     background: white;
     border: 1px solid #ddd;
     border-radius: 6px;
@@ -327,6 +348,8 @@
 }
 
 .dropdownItem {
+    gap: 0.75rem;
+    white-space: nowrap;
     padding: 0.65rem 0.75rem;
     cursor: pointer;
     border-radius: 4px;
@@ -454,6 +477,11 @@
 
     .inputGroup {
         width: 100%;
+    }
+
+    /* 한 줄에 한 칸씩 쌓이므로 최소 폭이 필요 없음 (좁은 휴대폰에서 가로 스크롤 방지) */
+    .cardGroup {
+        min-width: 0;
     }
 
     .previewButton {

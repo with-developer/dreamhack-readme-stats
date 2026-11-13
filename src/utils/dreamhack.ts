@@ -1,4 +1,13 @@
-import { TgetLastRankResponse, TUserRankingResponse, TuserData, TUserRankingResult } from '../types';
+import {
+  TCtfSeason,
+  TCtfSeasonResult,
+  TCtfSeasonSummary,
+  TgetLastRankResponse,
+  TSolveRecord,
+  TUserRankingResponse,
+  TuserData,
+  TUserRankingResult,
+} from '../types';
 import {
   getUserIdFromCache,
   saveUserIdToCache,
@@ -179,8 +188,162 @@ export async function getUserData(userId: number, username?: string): Promise<Tu
   }
 }
 
+export type TSolveSort = 'recent' | 'hardest';
+
+interface TWargameStatsResponse {
+  results: {
+    solved_at?: string;
+    challenge?: { title?: string; tier?: number; tags?: string[]; cnt_solvers?: number };
+  }[];
+}
+
+// 사용자의 풀이 기록 (최근 순 또는 난이도 높은 순). 조회 실패 시 예외를 던짐
+export async function getUserSolves(userId: number, sort: TSolveSort, limit: number): Promise<TSolveRecord[]> {
+  const params = new URLSearchParams({
+    user_id: String(userId),
+    limit: String(limit),
+    offset: '0',
+    ordering: sort === 'hardest' ? '-challenge__tier' : '-solved_at',
+  });
+  const response = await measureFetch(`https://dreamhack.io/api/v1/wargame/stats/?${params}`, 'getUserSolves');
+  if (!response.ok) {
+    throw new Error(`Failed to fetch solves: ${response.status}`);
+  }
+  const data = await response.json() as TWargameStatsResponse;
+  // 문제 정보가 빠진 기록(삭제된 문제 등)은 빈 줄로 그리지 않도록 건너뜀
+  return (data.results || []).filter((record) => !!record.challenge?.title).slice(0, limit).map((record) => ({
+    title: record.challenge?.title ?? '',
+    tier: record.challenge?.tier ?? 0,
+    tags: record.challenge?.tags ?? [],
+    solvedAt: record.solved_at ?? '',
+    solvers: record.challenge?.cnt_solvers ?? 0,
+  }));
+}
+
+// ---------- CTF 시즌 ----------
+
+interface TCtfSeasonsResponseItem {
+  number: number;
+  starts_at: string;
+  ends_at: string;
+}
+
+interface TCtfTierResponse {
+  tier?: string;
+  tier_class?: string;
+}
+
+interface TCtfSeasonHighlightResponse {
+  graph_data?: { round?: number; rating?: number; rank?: number | null }[];
+  season_result?: {
+    tier?: TCtfTierResponse;
+    season_participants?: number;
+    rating?: number;
+    rank?: number;
+  } | null;
+  cnt_participated?: number;
+}
+
+interface TCtfSeasonHighlightsResponse {
+  graph_data?: { number?: number; rating?: number; rank?: number; tier?: TCtfTierResponse }[];
+}
+
+// 시즌 목록은 1년에 한 번 바뀌므로 함수 인스턴스 안에서 1시간 동안 재사용
+const CTF_SEASONS_TTL_MS = 60 * 60 * 1000;
+let ctfSeasonsCache: { fetchedAt: number; seasons: TCtfSeason[] } | null = null;
+
+export function resetCtfSeasonsCacheForTest() {
+  ctfSeasonsCache = null;
+}
+
+export async function getCtfSeasons(): Promise<TCtfSeason[]> {
+  if (ctfSeasonsCache && Date.now() - ctfSeasonsCache.fetchedAt < CTF_SEASONS_TTL_MS) {
+    return ctfSeasonsCache.seasons;
+  }
+  let data: TCtfSeasonsResponseItem[];
+  try {
+    const response = await measureFetch('https://dreamhack.io/api/v1/ctf/seasons/', 'getCtfSeasons');
+    if (!response.ok) {
+      throw new Error(`Failed to fetch CTF seasons: ${response.status}`);
+    }
+    data = await response.json() as TCtfSeasonsResponseItem[];
+  } catch (error) {
+    // 시즌 목록 조회만 실패하면, 시간이 지났더라도 전에 받아 둔 목록으로 카드를 그림
+    if (ctfSeasonsCache) {
+      console.error('Using stale CTF seasons after fetch failure:', error);
+      return ctfSeasonsCache.seasons;
+    }
+    throw error;
+  }
+  const seasons = data
+    .filter((season) => Number.isInteger(season.number))
+    .map((season) => ({ number: season.number, startsAt: season.starts_at, endsAt: season.ends_at }))
+    .sort((a, b) => a.number - b.number);
+  ctfSeasonsCache = { fetchedAt: Date.now(), seasons };
+  return seasons;
+}
+
+// 지금 진행 중인 시즌 번호. 시즌 기간이 겹치면 나중 시즌, 시즌 사이 공백이면 가장 최근에 시작한 시즌
+export function getCurrentCtfSeason(seasons: TCtfSeason[], now: Date = new Date()): number | null {
+  const time = now.getTime();
+  const started = seasons.filter((season) => new Date(season.startsAt).getTime() <= time);
+  if (started.length === 0) return null;
+  const running = started.filter((season) => time <= new Date(season.endsAt).getTime());
+  const pool = running.length ? running : started;
+  return Math.max(...pool.map((season) => season.number));
+}
+
+// 한 시즌의 공식 결과. 그 시즌에 결과가 없으면(참가하지 않음) null, 조회 실패는 예외
+export async function getCtfSeasonResult(userId: number, season: number): Promise<TCtfSeasonResult | null> {
+  const response = await measureFetch(
+    `https://dreamhack.io/api/v1/ctf/seasons/${season}/highlight/?user_id=${userId}`,
+    `getCtfSeasonResult(S${season})`
+  );
+  if (!response.ok) {
+    throw new Error(`Failed to fetch CTF season ${season}: ${response.status}`);
+  }
+  const data = await response.json() as TCtfSeasonHighlightResponse;
+  const result = data.season_result;
+  if (!result || typeof result.rating !== 'number') return null;
+  return {
+    season,
+    tier: result.tier?.tier ?? '',
+    tierClass: result.tier?.tier_class ?? 'unranked',
+    rating: result.rating,
+    rank: result.rank ?? 0,
+    participants: result.season_participants ?? 0,
+    contests: data.cnt_participated ?? null,
+    rounds: (data.graph_data ?? [])
+      .filter((round) => typeof round.rating === 'number')
+      .map((round) => ({ round: round.round ?? 0, rating: round.rating as number, rank: round.rank ?? null })),
+  };
+}
+
+// 끝난 시즌들의 결과 목록 (시즌 번호 순). 진행 중인 시즌은 들어 있지 않음
+export async function getCtfSeasonHistory(userId: number): Promise<TCtfSeasonSummary[]> {
+  const response = await measureFetch(
+    `https://dreamhack.io/api/v1/ctf/seasons/highlights/?user_id=${userId}`,
+    'getCtfSeasonHistory'
+  );
+  if (!response.ok) {
+    throw new Error(`Failed to fetch CTF season history: ${response.status}`);
+  }
+  const data = await response.json() as TCtfSeasonHighlightsResponse;
+  return (data.graph_data ?? [])
+    .filter((item) => typeof item.number === 'number' && typeof item.rating === 'number')
+    .map((item) => ({
+      season: item.number as number,
+      tier: item.tier?.tier ?? '',
+      tierClass: item.tier?.tier_class ?? 'unranked',
+      rating: item.rating as number,
+      ...(typeof item.rank === 'number' && item.rank > 0 ? { rank: item.rank } : {}),
+    }))
+    .sort((a, b) => a.season - b.season);
+}
+
 export function calculateTopPercentage(rank: number | null, totalRanks: number | null): string {
   if (!rank || !totalRanks) return 'N/A';
   const percentage = (rank / totalRanks) * 100;
-  return percentage.toFixed(2);
+  // 1위처럼 아주 작은 값이 0.00%로 보이지 않도록
+  return percentage < 0.01 ? '<0.01' : percentage.toFixed(2);
 } 
