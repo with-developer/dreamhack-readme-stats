@@ -121,19 +121,19 @@ Dreamhack CTF 티어와 레이팅은 시즌마다 새로 시작하므로, 카드
 
 <table>
   <tr>
-    <td align="center"><code>light</code><br /><img src="public/examples/stats.svg" width="360" alt="light 테마" /></td>
-    <td align="center"><code>dark</code><br /><img src="public/examples/stats-dark.svg" width="360" alt="dark 테마" /></td>
+    <td align="center"><p><code>light</code></p><img src="public/examples/stats.svg" width="360" alt="light 테마" /></td>
+    <td align="center"><p><code>dark</code></p><img src="public/examples/stats-dark.svg" width="360" alt="dark 테마" /></td>
   </tr>
   <tr>
-    <td align="center"><code>dracula</code><br /><img src="public/examples/stats-dracula.svg" width="360" alt="dracula 테마" /></td>
-    <td align="center"><code>tokyonight</code><br /><img src="public/examples/stats-tokyonight.svg" width="360" alt="tokyonight 테마" /></td>
+    <td align="center"><p><code>dracula</code></p><img src="public/examples/stats-dracula.svg" width="360" alt="dracula 테마" /></td>
+    <td align="center"><p><code>tokyonight</code></p><img src="public/examples/stats-tokyonight.svg" width="360" alt="tokyonight 테마" /></td>
   </tr>
   <tr>
-    <td align="center"><code>nord</code><br /><img src="public/examples/stats-nord.svg" width="360" alt="nord 테마" /></td>
-    <td align="center"><code>gruvbox</code><br /><img src="public/examples/stats-gruvbox.svg" width="360" alt="gruvbox 테마" /></td>
+    <td align="center"><p><code>nord</code></p><img src="public/examples/stats-nord.svg" width="360" alt="nord 테마" /></td>
+    <td align="center"><p><code>gruvbox</code></p><img src="public/examples/stats-gruvbox.svg" width="360" alt="gruvbox 테마" /></td>
   </tr>
   <tr>
-    <td align="center"><code>transparent</code><br /><img src="public/examples/stats-transparent.svg" width="360" alt="transparent 테마" /></td>
+    <td align="center"><p><code>transparent</code></p><img src="public/examples/stats-transparent.svg" width="360" alt="transparent 테마" /></td>
     <td></td>
   </tr>
 </table>
